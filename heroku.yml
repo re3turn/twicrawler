@@ -1,0 +1,7 @@
+build:
+  languages:
+    - python
+run:
+  worker:
+    command:
+      - python run.py
