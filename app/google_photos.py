@@ -26,10 +26,10 @@ class GoogleApiResponseNG(Exception):
 
 class GooglePhotos:
     def __init__(self):
-        self.access_token_store = Storage(TOKEN_FILE)
-        self.credentials = self.access_token_store.get()
         self.make_client_secret_json()
         self.make_access_token_json()
+        self.access_token_store = Storage(TOKEN_FILE)
+        self.credentials = self.access_token_store.get()
         self.service = None
 
     @staticmethod
