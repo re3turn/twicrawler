@@ -4,7 +4,7 @@ from app import crawler
 
 
 def main():
-    crawler.main()
+    crawler.Crawler().main()
 
 
 if __name__ == '__main__':
