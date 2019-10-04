@@ -38,7 +38,11 @@ class Crawler:
                 if error.resp.reason in ['invalidCredentials']:
                     self.google_photos.update_authenticated_service()
                     continue
-                print(error.resp.reason, file=sys.stderr)
+                print(f'HTTP status={error.resp.reason}', file=sys.stderr)
+                traceback.print_exc()
+                return False
+            except Exception as error:
+                print(f'Error reason={error}', file=sys.stderr)
                 traceback.print_exc()
                 return False
 

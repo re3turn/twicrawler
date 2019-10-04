@@ -116,9 +116,11 @@ class GooglePhotos:
         return status
 
     @staticmethod
-    @retry(requests.exceptions.HTTPError, tries=3, delay=1)
+    @retry((requests.exceptions.HTTPError, Exception), tries=3, delay=1)
     def _execute_upload_api(url, data, headers):
         response = requests.post(url, data=data, headers=headers)
+        if not response.ok:
+            raise Exception("API response NG")
         return response
 
     def upload_media(self, file_path):
