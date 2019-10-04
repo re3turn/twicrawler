@@ -29,8 +29,6 @@ class Crawler:
         urllib.request.urlretrieve(media_url, download_path)
 
     def upload_google_photos(self, media_path):
-        self.google_photos.update_authenticated_service()
-
         while True:
             try:
                 self.google_photos.upload_media(media_path)
