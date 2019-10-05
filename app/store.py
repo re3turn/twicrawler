@@ -3,14 +3,16 @@
 import psycopg2
 import os
 import pytz
+
 from datetime import datetime
+from app.env import Env
 
 
 class Store:
     def __init__(self):
-        self._db_url = os.environ.get('DATABASE_URL')
-        self._sslmode = os.environ.get('DATABASE_SSLMODE', 'require')
-        timezone = os.environ.get('TZ')
+        self._db_url = Env.get_environment('DATABASE_URL')
+        self._sslmode = Env.get_environment('DATABASE_SSLMODE', default='require')
+        timezone = Env.get_environment('TZ', required=False)
         if timezone is None:
             self._tz = pytz.timezone(pytz.utc.zone)
         else:

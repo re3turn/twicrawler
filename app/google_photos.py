@@ -10,6 +10,8 @@ from googleapiclient.discovery import build
 from google_auth_httplib2 import AuthorizedHttp
 from google_auth_oauthlib.flow import InstalledAppFlow
 
+from app.env import Env
+
 API_SERVICE_NAME = 'photoslibrary'
 API_VERSION = 'v1'
 SCOPES = ['https://www.googleapis.com/auth/photoslibrary']
@@ -29,12 +31,8 @@ class GooglePhotos:
 
     @staticmethod
     def get_access_token():
-        client_id = os.environ.get('GOOGLE_CLIENT_ID')
-        if client_id is None:
-            sys.exit('Please set environment "GOOGLE_CLIENT_ID"')
-        client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
-        if client_secret is None:
-            sys.exit('Please set environment "GOOGLE_CLIENT_SECRET"')
+        client_id = Env.get_environment('GOOGLE_CLIENT_ID')
+        client_secret = Env.get_environment('GOOGLE_CLIENT_SECRET')
         client_config = {
             "installed": {
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
@@ -50,13 +48,9 @@ class GooglePhotos:
 
     @staticmethod
     def make_credentials():
-        client_id = os.environ.get('GOOGLE_CLIENT_ID')
-        if client_id is None:
-            sys.exit('Please set environment "GOOGLE_CLIENT_ID"')
-        client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
-        if client_secret is None:
-            sys.exit('Please set environment "GOOGLE_CLIENT_SECRET"')
-        refresh_token = os.environ.get('GOOGLE_REFRESH_TOKEN')
+        client_id = Env.get_environment('GOOGLE_CLIENT_ID')
+        client_secret = Env.get_environment('GOOGLE_CLIENT_SECRET')
+        refresh_token = Env.get_environment('GOOGLE_REFRESH_TOKEN')
         return Credentials(
             DUMMY_ACCESS_TOKEN,
             refresh_token,

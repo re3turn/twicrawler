@@ -7,29 +7,19 @@ import traceback
 import tweepy
 import time
 
+from app.env import Env
 from app.instagram import Instagram
 
 
 class Twitter:
     def __init__(self):
-        self.tweet_page = int(os.environ.get('TWEET_PAGES', '5'))
-        self.tweet_count = int(os.environ.get('TWEET_COUNT', '100'))
+        self.tweet_page = int(Env.get_environment('TWEET_PAGES', default='5'))
+        self.tweet_count = int(Env.get_environment('TWEET_COUNT', default='100'))
 
-        consumer_key = os.environ.get('TWITTER_CONSUMER_KEY')
-        if consumer_key is None:
-            sys.exit('Please set environment "TWITTER_CONSUMER_KEY"')
-
-        consumer_secret = os.environ.get('TWITTER_CONSUMER_SECRET')
-        if consumer_secret is None:
-            sys.exit('Please set environment "TWITTER_CONSUMER_SECRET"')
-
-        access_token = os.environ.get('TWITTER_ACCESS_TOKEN')
-        if access_token is None:
-            sys.exit('Please set environment "TWITTER_ACCESS_TOKEN"')
-
-        access_token_secret = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
-        if access_token_secret is None:
-            sys.exit('Please set environment "TWITTER_ACCESS_TOKEN_SECRET"')
+        consumer_key = Env.get_environment('TWITTER_CONSUMER_KEY')
+        consumer_secret = Env.get_environment('TWITTER_CONSUMER_SECRET')
+        access_token = Env.get_environment('TWITTER_ACCESS_TOKEN')
+        access_token_secret = Env.get_environment('TWITTER_ACCESS_TOKEN_SECRET')
 
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         auth.set_access_token(access_token, access_token_secret)

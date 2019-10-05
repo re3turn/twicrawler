@@ -10,6 +10,8 @@ import urllib
 
 from googleapiclient.errors import HttpError
 from retry import retry
+
+from app.env import Env
 from app.google_photos import GooglePhotos
 from app.store import Store
 from app.twitter import Twitter, TwitterUser
@@ -88,10 +90,8 @@ class Crawler:
         self.backup_media(media_tweet_dicts)
 
     def main(self):
-        interval_minutes = int(os.environ.get('INTERVAL', '5'))
-        user_ids = os.environ.get('TWITTER_USER_IDS')
-        if user_ids is None:
-            sys.exit('Please set environment "TWITTER_USER_IDS"')
+        interval_minutes = int(Env.get_environment('INTERVAL', default='5'))
+        user_ids = Env.get_environment('TWITTER_USER_IDS')
 
         user_list = [TwitterUser(user_id) for user_id in user_ids.split(',')]
 
