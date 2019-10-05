@@ -1,0 +1,34 @@
+version: "3.7"
+services:
+  app:
+    build:
+      context: .
+    image: twicrawler
+    volumes:
+      - .:/app
+    environment:
+      TZ: "Asia/Tokyo"
+      DATABASE_URL: "postgres://postgres:postgres@postgres:5432/postgres"
+      DATABASE_SSLMODE: "disable"
+      TWITTER_CONSUMER_KEY:
+      TWITTER_CONSUMER_SECRET:
+      TWITTER_ACCESS_TOKEN:
+      TWITTER_ACCESS_TOKEN_SECRET:
+      GOOGLE_CLIENT_ID:
+      GOOGLE_CLIENT_SECRET:
+      GOOGLE_REFRESH_TOKEN:
+      TWITTER_USER_IDS:
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./database.sql:/docker-entrypoint-initdb.d/database.sql
+      - postgres:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+volumes:
+  postgres:
