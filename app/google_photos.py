@@ -8,6 +8,7 @@ from retry import retry
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from google_auth_httplib2 import AuthorizedHttp
+from google_auth_oauthlib.flow import InstalledAppFlow
 
 API_SERVICE_NAME = 'photoslibrary'
 API_VERSION = 'v1'
@@ -25,6 +26,27 @@ class GooglePhotos:
         self.credentials = self.make_credentials()
         self.service = build(API_SERVICE_NAME, API_VERSION, credentials=self.credentials)
         self.authorized_http = AuthorizedHttp(credentials=self.credentials)
+
+    @staticmethod
+    def get_access_token():
+        client_id = os.environ.get('GOOGLE_CLIENT_ID')
+        if client_id is None:
+            sys.exit('Please set environment "GOOGLE_CLIENT_ID"')
+        client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
+        if client_secret is None:
+            sys.exit('Please set environment "GOOGLE_CLIENT_SECRET"')
+        client_config = {
+            "installed": {
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://accounts.google.com/o/oauth2/token",
+                "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob"],
+                "client_id": client_id,
+                "client_secret": client_secret
+            }
+        }
+        flow = InstalledAppFlow.from_client_config(client_config, SCOPES)
+        credentials = flow.run_console()
+        print(f'refresh_token: {vars(credentials)["_refresh_token"]}')
 
     @staticmethod
     def make_credentials():

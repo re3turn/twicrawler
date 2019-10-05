@@ -1,5 +1,6 @@
 beautifulsoup4 >= 4.8.0
 google-api-python-client
+google-auth-oauthlib
 httplib2
 nose2 >= 0.9.1
 oauth2client
