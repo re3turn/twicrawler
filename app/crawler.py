@@ -2,7 +2,6 @@
 
 import os
 import re
-import subprocess
 import sys
 import time
 import traceback
@@ -75,8 +74,7 @@ class Crawler:
                     continue
 
                 # delete
-                sub = subprocess.Popen(f'rm -f {download_path}', shell=True)
-                subprocess.Popen.wait(sub)
+                os.remove(download_path)
 
             # store update
             try:
