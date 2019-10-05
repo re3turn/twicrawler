@@ -90,7 +90,7 @@ class Crawler:
 
     def main(self):
         interval_minutes = int(Env.get_environment('INTERVAL', default='5'))
-        user_ids = Env.get_environment('TWITTER_USER_IDS')
+        user_ids = Env.get_environment('TWITTER_USER_IDS', required=True)
 
         user_list = [TwitterUser(user_id) for user_id in user_ids.split(',')]
 

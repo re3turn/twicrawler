@@ -16,10 +16,10 @@ class Twitter:
         self.tweet_page = int(Env.get_environment('TWEET_PAGES', default='5'))
         self.tweet_count = int(Env.get_environment('TWEET_COUNT', default='100'))
 
-        consumer_key = Env.get_environment('TWITTER_CONSUMER_KEY')
-        consumer_secret = Env.get_environment('TWITTER_CONSUMER_SECRET')
-        access_token = Env.get_environment('TWITTER_ACCESS_TOKEN')
-        access_token_secret = Env.get_environment('TWITTER_ACCESS_TOKEN_SECRET')
+        consumer_key = Env.get_environment('TWITTER_CONSUMER_KEY', required=True)
+        consumer_secret = Env.get_environment('TWITTER_CONSUMER_SECRET', required=True)
+        access_token = Env.get_environment('TWITTER_ACCESS_TOKEN', required=True)
+        access_token_secret = Env.get_environment('TWITTER_ACCESS_TOKEN_SECRET', required=True)
 
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         auth.set_access_token(access_token, access_token_secret)

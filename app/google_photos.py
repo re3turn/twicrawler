@@ -31,8 +31,8 @@ class GooglePhotos:
 
     @staticmethod
     def get_access_token():
-        client_id = Env.get_environment('GOOGLE_CLIENT_ID')
-        client_secret = Env.get_environment('GOOGLE_CLIENT_SECRET')
+        client_id = Env.get_environment('GOOGLE_CLIENT_ID', required=True)
+        client_secret = Env.get_environment('GOOGLE_CLIENT_SECRET', required=True)
         client_config = {
             "installed": {
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
@@ -48,9 +48,9 @@ class GooglePhotos:
 
     @staticmethod
     def make_credentials():
-        client_id = Env.get_environment('GOOGLE_CLIENT_ID')
-        client_secret = Env.get_environment('GOOGLE_CLIENT_SECRET')
-        refresh_token = Env.get_environment('GOOGLE_REFRESH_TOKEN')
+        client_id = Env.get_environment('GOOGLE_CLIENT_ID', required=True)
+        client_secret = Env.get_environment('GOOGLE_CLIENT_SECRET', required=True)
+        refresh_token = Env.get_environment('GOOGLE_REFRESH_TOKEN', required=True)
         return Credentials(
             DUMMY_ACCESS_TOKEN,
             refresh_token,
