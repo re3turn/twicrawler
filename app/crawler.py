@@ -33,9 +33,6 @@ class Crawler:
             try:
                 self.google_photos.upload_media(media_path)
             except HttpError as error:
-                if error.resp.reason in ['invalidCredentials']:
-                    self.google_photos.update_authenticated_service()
-                    continue
                 print(f'HTTP status={error.resp.reason}', file=sys.stderr)
                 traceback.print_exc()
                 return False
