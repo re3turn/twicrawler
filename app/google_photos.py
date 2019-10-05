@@ -13,6 +13,7 @@ API_SERVICE_NAME = 'photoslibrary'
 API_VERSION = 'v1'
 SCOPES = ['https://www.googleapis.com/auth/photoslibrary']
 UPLOAD_API_URL ='https://photoslibrary.googleapis.com/v1/uploads'
+DUMMY_ACCESS_TOKEN = 'dummy_access_token'
 
 
 class GoogleApiResponseNG(Exception):
@@ -33,10 +34,9 @@ class GooglePhotos:
         client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
         if client_secret is None:
             sys.exit('Please set environment "GOOGLE_CLIENT_SECRET"')
-        access_token = os.environ.get('GOOGLE_ACCESS_TOKEN')
         refresh_token = os.environ.get('GOOGLE_REFRESH_TOKEN')
         return Credentials(
-            access_token,
+            DUMMY_ACCESS_TOKEN,
             refresh_token,
             None,
             "https://oauth2.googleapis.com/token",
