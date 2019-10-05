@@ -29,10 +29,10 @@ class Crawler:
     def download_media(media_url, download_path):
         urllib.request.urlretrieve(media_url, download_path)
 
-    def upload_google_photos(self, media_path):
+    def upload_google_photos(self, media_path, description):
         while True:
             try:
-                self.google_photos.upload_media(media_path)
+                self.google_photos.upload_media(media_path, description)
             except HttpError as error:
                 print(f'HTTP status={error.resp.reason}', file=sys.stderr)
                 traceback.print_exc()
@@ -51,11 +51,12 @@ class Crawler:
         return f'{self._download_dir}/{os.path.basename(url)}'
 
     def backup_media(self, media_tweet_dicts):
-        for tweet_id, tweet_status in media_tweet_dicts.items():
+        for tweet_id, tweet_status_media_dict in media_tweet_dicts.items():
+            tweet_status = tweet_status_media_dict['tweet_status']
             if self.store.is_added_tweet(tweet_id):
                 continue
-            print(tweet_status)
-            for url in tweet_status['urls']:
+            Twitter.show_media_info(tweet_status_media_dict)
+            for url in tweet_status_media_dict['urls']:
                 # download
                 download_path = self.make_download_path(url)
                 if url.startswith("https://pbs.twimg.com/media") or url.startswith("http://pbs.twimg.com/media"):
@@ -68,7 +69,7 @@ class Crawler:
                     continue
 
                 # upload
-                is_uploaded = self.upload_google_photos(download_path)
+                is_uploaded = self.upload_google_photos(download_path, Twitter.make_tweet_description(tweet_status))
                 if not is_uploaded:
                     print(f'upload failed. tweet_id={tweet_id}, media_url={url}', file=sys.stderr)
                     continue
@@ -78,7 +79,7 @@ class Crawler:
 
             # store update
             try:
-                self.store.insert_tweet_info(tweet_id, tweet_status['user_id'], tweet_status['tweet_date'])
+                self.store.insert_tweet_info(tweet_id, tweet_status.user.screen_name, str(tweet_status.created_at))
             except Exception as e:
                 print(f'Insert failed. tweet_id={tweet_id}', e.args, file=sys.stderr)
                 traceback.print_exc()

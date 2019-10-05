@@ -80,12 +80,13 @@ class GooglePhotos:
             raise GoogleApiResponseNG(f'Google API response NG, content={upload_token}')
         return upload_token.decode("utf-8")
 
-    def upload_media(self, file_path):
+    def upload_media(self, file_path, description):
         with open(file_path, 'rb') as file_data:
             upload_token = self._execute_upload_api(data=file_data, upload_file_name=os.path.basename(file_path))
 
         new_item = {
             'newMediaItems': [{
+                'description': description,
                 'simpleMediaItem': {
                     'uploadToken': upload_token
                 }

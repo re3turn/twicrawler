@@ -133,15 +133,35 @@ class Twitter:
         elif media_type == "Instagram":
             media_url_list = Instagram(self._get_instagram_url(tweet_status.entities)).get_media_urls()
 
-        tweet_status_dict = {'user_id': tweet_status.user.screen_name,
-                             'tweet_date': str(tweet_status.created_at),
-                             'tweet_id': tweet_status.id_str,
-                             'urls': media_url_list
-                             }
+        tweet_status_media_dict = {'tweet_status': tweet_status,
+                                    'urls': media_url_list
+                                  }
 
-        media_tweet_dict[tweet_status.id_str] = tweet_status_dict
+        media_tweet_dict[tweet_status.id_str] = tweet_status_media_dict
 
         return media_tweet_dict
+
+    @staticmethod
+    def make_tweet_permalink(tweet_status):
+        return f'https://twitter.com/{tweet_status.user.screen_name}/status/{tweet_status.id_str}'
+
+    @staticmethod
+    def make_tweet_description(tweet_status):
+        return f'{tweet_status.user.name}\n' \
+               f'@{tweet_status.user.screen_name}\n' \
+               f'{tweet_status.full_text}'
+
+    @classmethod
+    def show_media_info(cls, tweet_status_media_dict):
+        tweet_status = tweet_status_media_dict['tweet_status']
+        urls = tweet_status_media_dict['urls']
+        print(f'user_id={tweet_status.user.screen_name}, tweet_date={str(tweet_status.created_at)}, '
+              f'permalink={cls.make_tweet_permalink(tweet_status)}, media_urls={urls}')
+
+    @classmethod
+    def show_media_infos(cls, media_tweet_dict):
+        for _, tweet_status_media_dict in media_tweet_dict.items():
+            cls.show_media_info(tweet_status_media_dict)
 
     def show_favorite_tweet_media(self, user):
         for tweets in self.limit_handled(tweepy.Cursor(self.api.favorites,
@@ -156,7 +176,7 @@ class Twitter:
                     traceback.print_exc()
 
                 if medias:
-                    print(medias)
+                    self.show_media_infos(medias)
                 else:
                     print('no media')
 
@@ -181,7 +201,7 @@ class Twitter:
                 except:
                     traceback.print_exc()
                 if medias:
-                    print(medias)
+                    self.show_media_infos(medias)
                 else:
                     print('no media')
 
