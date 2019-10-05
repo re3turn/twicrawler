@@ -9,6 +9,7 @@ from datetime import datetime
 class Store:
     def __init__(self):
         self._db_url = os.environ.get('DATABASE_URL')
+        self._sslmode = os.environ.get('DATABASE_SSLMODE', 'require')
         timezone = os.environ.get('TZ')
         if timezone is None:
             self._tz = pytz.timezone(pytz.utc.zone)
@@ -20,7 +21,7 @@ class Store:
 
     def _get_connection(self):
         try:
-            connection = psycopg2.connect(self._db_url, sslmode='require')
+            connection = psycopg2.connect(self._db_url, sslmode=self._sslmode)
         except:
             import traceback
             traceback.print_exc()
