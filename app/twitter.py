@@ -15,6 +15,7 @@ class Twitter:
     def __init__(self):
         self.tweet_page = int(Env.get_environment('TWEET_PAGES', default='5'))
         self.tweet_count = int(Env.get_environment('TWEET_COUNT', default='100'))
+        self.mode = Env.get_environment('MODE_SPECIFIED', default='rt')
 
         consumer_key = Env.get_environment('TWITTER_CONSUMER_KEY', required=True)
         consumer_secret = Env.get_environment('TWITTER_CONSUMER_SECRET', required=True)
@@ -220,6 +221,8 @@ class Twitter:
                     continue
                 if not tweet.retweeted_status:
                     continue
+                if 'mixed' in self.mode and not hasattr(tweet, "favorited"):
+                    continue
 
                 try:
                     media_tweet_dict = self.get_media_tweets(tweet)
@@ -230,6 +233,15 @@ class Twitter:
                     media_tweet_dicts.update(media_tweet_dict)
 
         return media_tweet_dicts
+
+    def get_target_tweets(self, user):
+        target_tweets_dict = {}
+        if 'fav' in self.mode:
+            # TODO: add process for fav only
+            pass
+        if 'rt' in self.mode or 'mixed' in self.mode:
+            target_tweets_dict.update(self.get_rt_media(user))
+        return target_tweets_dict
 
 
 class TwitterUser:

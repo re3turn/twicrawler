@@ -84,8 +84,8 @@ class Crawler:
                 print(f'Insert failed. tweet_id={tweet_id}', e.args, file=sys.stderr)
                 traceback.print_exc()
 
-    def crawling_rt(self, user):
-        media_tweet_dicts = self.twitter.get_rt_media(user)
+    def crawling_tweets(self, user):
+        media_tweet_dicts = self.twitter.get_target_tweets(user)
         self.backup_media(media_tweet_dicts)
 
     def main(self):
@@ -97,7 +97,7 @@ class Crawler:
         while True:
             try:
                 for user in user_list:
-                    self.crawling_rt(user)
+                    self.crawling_tweets(user)
             except:
                 traceback.print_exc()
 
