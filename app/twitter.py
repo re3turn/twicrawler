@@ -181,6 +181,23 @@ class Twitter:
                 else:
                     print('no media')
 
+    def get_favorite_media(self, user: str):
+        for tweets in self.limit_handled(tweepy.Cursor(self.api.favorites,
+                                                       id=user.id,
+                                                       count=self.tweet_count,
+                                                       tweet_mode="extended").pages(self.tweet_page)):
+            media_tweet_dicts = {}
+            for tweet in tweets:
+                try:
+                    media_tweet_dict = self.get_media_tweets(tweet)
+                except:
+                    traceback.print_exc()
+
+                if media_tweet_dict:
+                    media_tweet_dicts.update(media_tweet_dict)
+
+        return media_tweet_dicts
+
     def show_rt_media(self, user):
         for tweets in self.limit_handled(tweepy.Cursor(self.api.user_timeline,
                                                        id=user.id,
@@ -237,7 +254,7 @@ class Twitter:
     def get_target_tweets(self, user):
         target_tweets_dict = {}
         if 'fav' in self.mode:
-            # TODO: add process for fav only
+            target_tweets_dict.update(self.get_favorite_media(user))
             pass
         if 'rt' in self.mode or 'mixed' in self.mode:
             target_tweets_dict.update(self.get_rt_media(user))
