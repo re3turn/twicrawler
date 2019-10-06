@@ -221,6 +221,8 @@ class Twitter:
                     continue
                 if not tweet.retweeted_status:
                     continue
+                if 'mixed' in self.mode and not hasattr(tweet, "favorited"):
+                    continue
 
                 try:
                     media_tweet_dict = self.get_media_tweets(tweet)
@@ -236,14 +238,9 @@ class Twitter:
         target_tweets_dict = {}
         if 'fav' in self.mode:
             # TODO: add process for fav only
+            pass
+        if 'rt' in self.mode or 'mixed' in self.mode:
             target_tweets_dict.update(self.get_rt_media(user))
-        if 'rt' in self.mode:
-            target_tweets_dict.update(self.get_rt_media(user))
-        if 'mixed' in self.mode:
-            rt_media_tweet_dicts = self.get_rt_media(user)
-            for tweet_id, status_dict in rt_media_tweet_dicts.items():
-                if status_dict['tweet_status'].favorited:
-                    target_tweets_dict[tweet_id] = status_dict
         return target_tweets_dict
 
 
