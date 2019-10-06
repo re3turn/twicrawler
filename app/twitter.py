@@ -115,7 +115,7 @@ class Twitter:
         media_tweet_dict = {}
 
         if self.is_quoted(tweet) and hasattr(tweet, "quoted_status"):
-            media_tweet_dict.update(self.get_media_urls(tweet.quoted_status))
+            media_tweet_dict.update(self.get_media_tweets(tweet.quoted_status))
 
         tweet_status = tweet
         if tweet.retweeted and hasattr(tweet, "retweeted_status"):
