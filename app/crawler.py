@@ -84,20 +84,32 @@ class Crawler:
                 print(f'Insert failed. tweet_id={tweet_id}', e.args, file=sys.stderr)
                 traceback.print_exc()
 
-    def crawling_rt(self, user):
-        media_tweet_dicts = self.twitter.get_rt_media(user)
+    def crawling_tweets(self, user, mode='rt'):
+        if mode == 'fav':
+            # TODO: add process for fav only
+            media_tweet_dicts = self.twitter.get_rt_media(user)
+        else:
+            rt_media_tweet_dicts = self.twitter.get_rt_media(user)
+            if mode == 'rt':
+                media_tweet_dicts = rt_media_tweet_dicts
+            elif mode == 'combination':
+                media_tweet_dicts = {}
+                for tweet_id, status_dict in rt_media_tweet_dicts.items():
+                    if status_dict['tweet_status'].favorited:
+                        media_tweet_dicts[tweet_id] = status_dict
         self.backup_media(media_tweet_dicts)
 
     def main(self):
         interval_minutes = int(Env.get_environment('INTERVAL', default='5'))
         user_ids = Env.get_environment('TWITTER_USER_IDS', required=True)
+        mode = Env.get_environment('MODE_SPECIFIED', default='rt')
 
         user_list = [TwitterUser(user_id) for user_id in user_ids.split(',')]
 
         while True:
             try:
                 for user in user_list:
-                    self.crawling_rt(user)
+                    self.crawling_tweets(user, mode)
             except:
                 traceback.print_exc()
 
