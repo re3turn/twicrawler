@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import os
-import sys
 import googleapiclient.errors
 
 from retry import retry
@@ -15,7 +14,7 @@ from app.env import Env
 API_SERVICE_NAME = 'photoslibrary'
 API_VERSION = 'v1'
 SCOPES = ['https://www.googleapis.com/auth/photoslibrary']
-UPLOAD_API_URL ='https://photoslibrary.googleapis.com/v1/uploads'
+UPLOAD_API_URL = 'https://photoslibrary.googleapis.com/v1/uploads'
 DUMMY_ACCESS_TOKEN = 'dummy_access_token'
 
 
@@ -34,12 +33,12 @@ class GooglePhotos:
         client_id = Env.get_environment('GOOGLE_CLIENT_ID', required=True)
         client_secret = Env.get_environment('GOOGLE_CLIENT_SECRET', required=True)
         client_config = {
-            "installed": {
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://accounts.google.com/o/oauth2/token",
-                "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob"],
-                "client_id": client_id,
-                "client_secret": client_secret
+            'installed': {
+                'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
+                'token_uri': 'https://accounts.google.com/o/oauth2/token',
+                'redirect_uris': ['urn:ietf:wg:oauth:2.0:oob'],
+                'client_id': client_id,
+                'client_secret': client_secret
             }
         }
         flow = InstalledAppFlow.from_client_config(client_config, SCOPES)
@@ -55,7 +54,7 @@ class GooglePhotos:
             DUMMY_ACCESS_TOKEN,
             refresh_token,
             None,
-            "https://oauth2.googleapis.com/token",
+            'https://oauth2.googleapis.com/token',
             client_id,
             client_secret,
             SCOPES
@@ -70,15 +69,16 @@ class GooglePhotos:
     @retry((GoogleApiResponseNG, ConnectionAbortedError), tries=3, delay=1)
     def _execute_upload_api(self, data, upload_file_name):
         headers = {
-            'Authorization': "Bearer " + self.credentials.token,
+            'Authorization': 'Bearer ' + self.credentials.token,
             'Content-Type': 'application/octet-stream',
             'X-Goog-Upload-File-Name': upload_file_name,
-            'X-Goog-Upload-Protocol': "raw",
+            'X-Goog-Upload-Protocol': 'raw',
         }
-        (response, upload_token) = self.authorized_http.request(uri=UPLOAD_API_URL, method='POST', body=data, headers=headers)
+        (response, upload_token) = self.authorized_http.request(uri=UPLOAD_API_URL, method='POST', body=data,
+                                                                headers=headers)
         if response.status != 200:
             raise GoogleApiResponseNG(f'Google API response NG, content={upload_token}')
-        return upload_token.decode("utf-8")
+        return upload_token.decode('utf-8')
 
     def upload_media(self, file_path, description):
         with open(file_path, 'rb') as file_data:
@@ -98,4 +98,4 @@ class GooglePhotos:
 
 if __name__ == '__main__':
     google_photo = GooglePhotos()
-    print(google_photo.upload_media("test.jpg"))
+    print(google_photo.upload_media('test.jpg', 'test'))

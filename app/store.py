@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 import psycopg2
-import os
 import pytz
+import traceback
 
 from datetime import datetime
 from app.env import Env
@@ -24,8 +24,8 @@ class Store:
     def _get_connection(self):
         try:
             connection = psycopg2.connect(self._db_url, sslmode=self._sslmode)
-        except:
-            import traceback
+        except Exception as e:
+            print(e.args)
             traceback.print_exc()
             return None
 
@@ -47,7 +47,7 @@ class Store:
         return True
 
     def insert_tweet_info(self, tweet_id, user_id, tweet_date):
-        add_date = datetime.now(self._tz).strftime("%Y-%m-%d %H:%M:%S")
+        add_date = datetime.now(self._tz).strftime('%Y-%m-%d %H:%M:%S')
         with self._get_connection() as connection:
             with connection.cursor() as cursor:
                 cursor.execute(

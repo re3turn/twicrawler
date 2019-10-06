@@ -5,7 +5,8 @@ import re
 import sys
 import time
 import traceback
-import urllib
+import urllib.request
+import urllib.error
 
 from googleapiclient.errors import HttpError
 from retry import retry
@@ -47,7 +48,7 @@ class Crawler:
         return True
 
     def make_download_path(self, url):
-        url = re.sub('\?.*$', '', url)
+        url = re.sub(r'\?.*$', '', url)
         return f'{self._download_dir}/{os.path.basename(url)}'
 
     def backup_media(self, media_tweet_dicts):
@@ -59,11 +60,11 @@ class Crawler:
             for url in tweet_status_media_dict['urls']:
                 # download
                 download_path = self.make_download_path(url)
-                if url.startswith("https://pbs.twimg.com/media") or url.startswith("http://pbs.twimg.com/media"):
+                if url.startswith('https://pbs.twimg.com/media') or url.startswith('http://pbs.twimg.com/media'):
                     url = self.twitter.make_original_image_url(url)
                 try:
                     Crawler.download_media(url, download_path)
-                except urllib.error.HTTPError as e:
+                except urllib.error.HTTPError:
                     traceback.print_exc()
                     print(f'download failed. tweet_id={tweet_id}, media_url={url}', file=sys.stderr)
                     continue
@@ -98,7 +99,8 @@ class Crawler:
             try:
                 for user in user_list:
                     self.crawling_tweets(user)
-            except:
+            except Exception as e:
+                print(e.args)
                 traceback.print_exc()
 
             time.sleep(interval_minutes * 60)
