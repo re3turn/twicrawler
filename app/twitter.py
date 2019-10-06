@@ -14,7 +14,7 @@ from app.instagram import Instagram
 class Twitter:
     def __init__(self):
         self.tweet_page = int(Env.get_environment('TWEET_PAGES', default='5'))
-        self.tweet_count = int(Env.get_environment('TWEET_COUNT', default='100'))
+        self.tweet_count = int(Env.get_environment('TWEET_COUNT', default='200'))
         self.mode = Env.get_environment('MODE_SPECIFIED', default='rt')
 
         consumer_key = Env.get_environment('TWITTER_CONSUMER_KEY', required=True)
