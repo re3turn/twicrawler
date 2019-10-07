@@ -117,12 +117,12 @@ class Twitter:
     def get_media_tweets(self, tweet):
         media_tweet_dict = {}
 
-        if self.is_quoted(tweet) and hasattr(tweet, 'quoted_status'):
-            media_tweet_dict.update(self.get_media_tweets(tweet.quoted_status))
-
         tweet_status = tweet
         if tweet.retweeted and hasattr(tweet, 'retweeted_status'):
             tweet_status = tweet.retweeted_status
+
+        if self.is_quoted(tweet_status) and hasattr(tweet_status, 'quoted_status'):
+            media_tweet_dict.update(self.get_media_tweets(tweet_status.quoted_status))
 
         if hasattr(tweet_status, 'extended_entities') and 'media' in tweet_status.extended_entities:
             media_type = 'Twitter'
