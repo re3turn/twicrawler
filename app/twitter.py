@@ -28,7 +28,8 @@ class Twitter:
 
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         auth.set_access_token(access_token, access_token_secret)
-        self.api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+        self.api = tweepy.API(auth, retry_count=3, retry_delay=5, retry_errors={500, 503}, wait_on_rate_limit=True,
+                              wait_on_rate_limit_notify=True)
 
     @staticmethod
     def make_original_image_url(url):
