@@ -26,7 +26,7 @@ class Crawler:
         os.makedirs(self._download_dir, exist_ok=True)
 
     @staticmethod
-    @retry(urllib.error.HTTPError, tries=3, delay=1)
+    @retry(urllib.error.HTTPError, tries=3, delay=2, backoff=2)
     def download_media(media_url, download_path):
         urllib.request.urlretrieve(media_url, download_path)
 

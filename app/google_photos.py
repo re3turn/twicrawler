@@ -60,13 +60,13 @@ class GooglePhotos:
             SCOPES
         )
 
-    @retry(googleapiclient.errors.HttpError, tries=3, delay=1)
+    @retry(googleapiclient.errors.HttpError, tries=3, delay=2, backoff=2)
     def create_media_item(self, new_item):
         response = self.service.mediaItems().batchCreate(body=new_item).execute()
         status = response['newMediaItemResults'][0]['status']
         return status
 
-    @retry((GoogleApiResponseNG, ConnectionAbortedError), tries=3, delay=1)
+    @retry((GoogleApiResponseNG, ConnectionAbortedError), tries=3, delay=2, backoff=2)
     def _execute_upload_api(self, data, upload_file_name):
         headers = {
             'Authorization': 'Bearer ' + self.credentials.token,
