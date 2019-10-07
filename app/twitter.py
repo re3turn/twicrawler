@@ -13,8 +13,8 @@ from app.instagram import Instagram
 
 class Twitter:
     def __init__(self):
-        self.tweet_page = int(Env.get_environment('TWEET_PAGES', default='5'))
-        self.tweet_count = int(Env.get_environment('TWEET_COUNT', default='100'))
+        self.tweet_page = int(Env.get_environment('TWEET_PAGES', default='25'))
+        self.tweet_count = int(Env.get_environment('TWEET_COUNT', default='200'))
         self.mode = Env.get_environment('MODE_SPECIFIED', default='rt')
 
         consumer_key = Env.get_environment('TWITTER_CONSUMER_KEY', required=True)
@@ -181,6 +181,24 @@ class Twitter:
                 else:
                     print('no media')
 
+    def get_favorite_media(self, user: str):
+        media_tweet_dicts = {}
+        for tweets in self.limit_handled(tweepy.Cursor(self.api.favorites,
+                                                       id=user.id,
+                                                       count=self.tweet_count,
+                                                       tweet_mode="extended").pages(self.tweet_page)):
+            for tweet in tweets:
+                media_tweet_dict = None
+                try:
+                    media_tweet_dict = self.get_media_tweets(tweet)
+                except:
+                    traceback.print_exc()
+
+                if media_tweet_dict:
+                    media_tweet_dicts.update(media_tweet_dict)
+
+        return media_tweet_dicts
+
     def show_rt_media(self, user):
         for tweets in self.limit_handled(tweepy.Cursor(self.api.user_timeline,
                                                        id=user.id,
@@ -237,8 +255,7 @@ class Twitter:
     def get_target_tweets(self, user):
         target_tweets_dict = {}
         if 'fav' in self.mode:
-            # TODO: add process for fav only
-            pass
+            target_tweets_dict.update(self.get_favorite_media(user))
         if 'rt' in self.mode or 'mixed' in self.mode:
             target_tweets_dict.update(self.get_rt_media(user))
         return target_tweets_dict

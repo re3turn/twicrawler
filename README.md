@@ -32,8 +32,8 @@ refresh_token: {REFRESH TOKEN}
 | TWITTER_USER_IDS            | Twitter user ID to crawling.If multiple users are specified, separate them with `,`                             | ✓       |
 | INTERVAL                    | Crawler interval(minutes). default=`5` minutes                                                                  |         |
 | MODE_SPECIFIED              | Specifies Crawler mode. `rt`, `fav`, `mixed`. default=`rt`                                                      |         |
-| TWEET_COUNT                 | Specifies the number of tweet statuses to retrieve. default=`100`                                               |         |
-| TWEET_PAGES                 | Specifies the page of results to retrieve. default=`5`                                                          |         |
+| TWEET_COUNT                 | Specifies the number of tweet statuses to retrieve. default=`200`                                               |         |
+| TWEET_PAGES                 | Specifies the page of results to retrieve. default=`25`                                                          |         |
 | DATABASE_URL                | Database url. format `postgres://<username>:<password>@<hostname>:<port>/<database>`                            | ✓       |
 | DATABASE_SSLMODE            | [Database sslmode.](https://gist.github.com/pfigue/3440e2bc986550a6b8ec#valid-sslmode-values) default=`require` |         |
 | TZ                          | Time zone                                                                                                       |         |
