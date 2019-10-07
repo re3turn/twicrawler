@@ -182,11 +182,12 @@ class Twitter:
                     print('no media')
 
     def get_favorite_media(self, user: str):
+        media_tweet_dicts = {}
         for tweets in self.limit_handled(tweepy.Cursor(self.api.favorites,
                                                        id=user.id,
                                                        count=self.tweet_count,
                                                        tweet_mode="extended").pages(self.tweet_page)):
-            media_tweet_dicts = {}
+            media_tweet_dict = None
             for tweet in tweets:
                 try:
                     media_tweet_dict = self.get_media_tweets(tweet)
@@ -255,7 +256,6 @@ class Twitter:
         target_tweets_dict = {}
         if 'fav' in self.mode:
             target_tweets_dict.update(self.get_favorite_media(user))
-            pass
         if 'rt' in self.mode or 'mixed' in self.mode:
             target_tweets_dict.update(self.get_rt_media(user))
         return target_tweets_dict
