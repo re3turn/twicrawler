@@ -187,8 +187,8 @@ class Twitter:
                                                        id=user.id,
                                                        count=self.tweet_count,
                                                        tweet_mode="extended").pages(self.tweet_page)):
-            media_tweet_dict = None
             for tweet in tweets:
+                media_tweet_dict = None
                 try:
                     media_tweet_dict = self.get_media_tweets(tweet)
                 except:
