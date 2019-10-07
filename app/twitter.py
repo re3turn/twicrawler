@@ -43,8 +43,6 @@ class Twitter:
         while True:
             try:
                 yield page.next()
-            except tweepy.RateLimitError:
-                time.sleep(15 * 60)
             except StopIteration:
                 break
 
