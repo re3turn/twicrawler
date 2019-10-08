@@ -257,10 +257,9 @@ class Twitter:
         target_tweets_dict = {}
         if 'fav' in self.mode:
             new_fav_result = self.get_favorite_media(user)
-            # valueにdictが入ってくるためitems()を用いた差集合の計算は出来ず、keys()で計算する
+            # valueにdict(unhashable)があるためitems()で差集合が計算できない。ので、keys()で計算する。
             diff_keys = new_fav_result.keys() - self._last_fav_result.keys()
-            for key in diff_keys:
-                target_tweets_dict[key] = new_fav_result[key]
+            target_tweets_dict.update({k:new_fav_result[k] for k in diff_keys})
             self._last_fav_result = new_fav_result
         if 'rt' in self.mode or 'mixed' in self.mode:
             target_tweets_dict.update(self.get_rt_media(user))
