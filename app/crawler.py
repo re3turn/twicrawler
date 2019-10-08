@@ -52,6 +52,9 @@ class Crawler:
         return f'{self._download_dir}/{os.path.basename(url)}'
 
     def backup_media(self, media_tweet_dicts):
+        if not media_tweet_dicts:
+            return
+
         target_tweet_ids = self.store.fetch_not_added_tweets(list(media_tweet_dicts.keys()))
         for tweet_id, in target_tweet_ids:
             tweet_status_media_dict = media_tweet_dicts[tweet_id]
