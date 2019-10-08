@@ -4,6 +4,7 @@ import re
 import traceback
 import tweepy
 import time
+import copy
 
 from app.env import Env
 from app.instagram import Instagram
@@ -20,6 +21,7 @@ class Twitter:
         self.tweet_page = int(Env.get_environment('TWEET_PAGES', default='25'))
         self.tweet_count = int(Env.get_environment('TWEET_COUNT', default='200'))
         self.mode = Env.get_environment('MODE_SPECIFIED', default='rt')
+        self.last_result = []
 
         consumer_key = Env.get_environment('TWITTER_CONSUMER_KEY', required=True)
         consumer_secret = Env.get_environment('TWITTER_CONSUMER_SECRET', required=True)
@@ -256,6 +258,12 @@ class Twitter:
         target_tweets_dict = {}
         if 'fav' in self.mode:
             target_tweets_dict.update(self.get_favorite_media(user))
+            # クラス変数に保持した前回の実行結果を使って未処理のツイートのみ抽出
+            last_result = copy.deepcopy(self.last_result))
+            self.last_result = [k for k,v in target_tweets_dict.items()]
+            for executed_id in self.last_result:
+                if executed_id in target_tweets_dict:
+                    del target_tweets_dict[executed_id]
         if 'rt' in self.mode or 'mixed' in self.mode:
             target_tweets_dict.update(self.get_rt_media(user))
         return target_tweets_dict
