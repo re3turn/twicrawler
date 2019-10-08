@@ -52,10 +52,11 @@ class Crawler:
         return f'{self._download_dir}/{os.path.basename(url)}'
 
     def backup_media(self, media_tweet_dicts):
-        for tweet_id, tweet_status_media_dict in media_tweet_dicts.items():
+        target_tweet_ids = self.store.fetch_not_added_tweets(list(media_tweet_dicts.keys()))
+        for tweet_id, in target_tweet_ids:
+            tweet_status_media_dict = media_tweet_dicts[tweet_id]
             tweet_status = tweet_status_media_dict['tweet_status']
-            if self.store.is_added_tweet(tweet_id):
-                continue
+
             Twitter.show_media_info(tweet_status_media_dict)
             for url in tweet_status_media_dict['urls']:
                 # download
