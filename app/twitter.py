@@ -4,7 +4,6 @@ import re
 import traceback
 import tweepy
 import time
-import copy
 
 from app.env import Env
 from app.instagram import Instagram
