@@ -21,7 +21,7 @@ class Twitter:
         self.tweet_page = int(Env.get_environment('TWEET_PAGES', default='25'))
         self.tweet_count = int(Env.get_environment('TWEET_COUNT', default='200'))
         self.mode = Env.get_environment('MODE_SPECIFIED', default='rt')
-        self.last_result = {}
+        self._last_result = {}
 
         consumer_key = Env.get_environment('TWITTER_CONSUMER_KEY', required=True)
         consumer_secret = Env.get_environment('TWITTER_CONSUMER_SECRET', required=True)
