@@ -20,7 +20,7 @@ class Twitter:
         self.tweet_page = int(Env.get_environment('TWEET_PAGES', default='25'))
         self.tweet_count = int(Env.get_environment('TWEET_COUNT', default='200'))
         self.mode = Env.get_environment('MODE_SPECIFIED', default='rt')
-        self._last_result = {}
+        self._last_fav_result = {}
 
         consumer_key = Env.get_environment('TWITTER_CONSUMER_KEY', required=True)
         consumer_secret = Env.get_environment('TWITTER_CONSUMER_SECRET', required=True)
@@ -256,9 +256,12 @@ class Twitter:
     def get_target_tweets(self, user):
         target_tweets_dict = {}
         if 'fav' in self.mode:
-            new_result = self.get_favorite_media(user)
-            target_tweets_dict.update(dict(self.last_result.items() - new_result.items()))
-            self.last_result = target_tweets_dict
+            new_fav_result = self.get_favorite_media(user)
+            # valueにdictが入ってくるためitems()を用いた差集合の計算は出来ず、keys()で計算する
+            diff_keys = new_fav_result.keys() - self._last_fav_result.keys()
+            for key in diff_keys:
+                target_tweets_dict[key] = new_fav_result[key]
+            self._last_fav_result = new_fav_result
         if 'rt' in self.mode or 'mixed' in self.mode:
             target_tweets_dict.update(self.get_rt_media(user))
         return target_tweets_dict
