@@ -69,7 +69,6 @@ class GooglePhotos:
     @retry((GoogleApiResponseNG, ConnectionAbortedError, TimeoutError), tries=3, delay=2, backoff=2)
     def _execute_upload_api(self, file_path):
         with open(file_path, 'rb') as file_data:
-            print(f'data={file_data}, upload_file_name={os.path.basename(file_path)}')
             headers = {
                 'Authorization': 'Bearer ' + self.credentials.token,
                 'Content-Type': 'application/octet-stream',
