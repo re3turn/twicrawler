@@ -67,22 +67,23 @@ class GooglePhotos:
         return status
 
     @retry((GoogleApiResponseNG, ConnectionAbortedError, TimeoutError), tries=3, delay=2, backoff=2)
-    def _execute_upload_api(self, data, upload_file_name):
-        headers = {
-            'Authorization': 'Bearer ' + self.credentials.token,
-            'Content-Type': 'application/octet-stream',
-            'X-Goog-Upload-File-Name': upload_file_name,
-            'X-Goog-Upload-Protocol': 'raw',
-        }
-        (response, upload_token) = self.authorized_http.request(uri=UPLOAD_API_URL, method='POST', body=data,
-                                                                headers=headers)
+    def _execute_upload_api(self, file_path):
+        with open(file_path, 'rb') as file_data:
+            headers = {
+                'Authorization': 'Bearer ' + self.credentials.token,
+                'Content-Type': 'application/octet-stream',
+                'X-Goog-Upload-File-Name': os.path.basename(file_path),
+                'X-Goog-Upload-Protocol': 'raw',
+            }
+            (response, upload_token) = self.authorized_http.request(uri=UPLOAD_API_URL, method='POST', body=file_data,
+                                                                    headers=headers)
+
         if response.status != 200:
-            raise GoogleApiResponseNG(f'Google API response NG, content={upload_token}')
+            raise GoogleApiResponseNG(f'Google API response NG, status={response.status}, content={upload_token}')
         return upload_token.decode('utf-8')
 
     def upload_media(self, file_path, description):
-        with open(file_path, 'rb') as file_data:
-            upload_token = self._execute_upload_api(data=file_data, upload_file_name=os.path.basename(file_path))
+        upload_token = self._execute_upload_api(file_path=file_path)
 
         new_item = {
             'newMediaItems': [{
