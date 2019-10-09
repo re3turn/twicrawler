@@ -33,7 +33,7 @@ class Store:
         connection.autocommit = True
         return connection
 
-    def insert_tweet_info(self, tweet_id, user_id, tweet_date):
+    def insert_tweet_info(self, tweet_id: str, user_id: str, tweet_date: str):
         add_date = datetime.now(self._tz).strftime('%Y-%m-%d %H:%M:%S')
         with self._connection.cursor() as cursor:
             cursor.execute(

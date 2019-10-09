@@ -27,10 +27,10 @@ class Crawler:
 
     @staticmethod
     @retry(urllib.error.HTTPError, tries=3, delay=2, backoff=2)
-    def download_media(media_url, download_path):
+    def download_media(media_url: str, download_path: str):
         urllib.request.urlretrieve(media_url, download_path)
 
-    def upload_google_photos(self, media_path, description):
+    def upload_google_photos(self, media_path: str, description: str):
         while True:
             try:
                 self.google_photos.upload_media(media_path, description)
@@ -47,11 +47,11 @@ class Crawler:
 
         return True
 
-    def make_download_path(self, url):
+    def make_download_path(self, url: str):
         url = re.sub(r'\?.*$', '', url)
         return f'{self._download_dir}/{os.path.basename(url)}'
 
-    def backup_media(self, media_tweet_dicts):
+    def backup_media(self, media_tweet_dicts: dict):
         if not media_tweet_dicts:
             return
 
@@ -89,7 +89,7 @@ class Crawler:
                 print(f'Insert failed. tweet_id={tweet_id}', e.args, file=sys.stderr)
                 traceback.print_exc()
 
-    def crawling_tweets(self, user):
+    def crawling_tweets(self, user: TwitterUser):
         media_tweet_dicts = self.twitter.get_target_tweets(user)
         self.backup_media(media_tweet_dicts)
 

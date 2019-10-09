@@ -10,7 +10,7 @@ from app.instagram import Instagram
 
 
 class TwitterUser(object):
-    def __init__(self, user_id):
+    def __init__(self, user_id: str):
         self.id = user_id
         self.since_id = 1
 
@@ -33,7 +33,7 @@ class Twitter:
                               wait_on_rate_limit_notify=True)
 
     @staticmethod
-    def make_original_image_url(url):
+    def make_original_image_url(url: str):
         if '?' in url:
             image_url = re.sub('name=[a-z0-9]+', 'name=orig', url)
             return image_url
@@ -41,7 +41,7 @@ class Twitter:
         return url + '?name=orig'
 
     @staticmethod
-    def limit_handled(page):
+    def limit_handled(page: tweepy.cursor.IdIterator):
         while True:
             try:
                 yield page.next()
@@ -49,11 +49,11 @@ class Twitter:
                 break
 
     @staticmethod
-    def is_quoted(tweet):
+    def is_quoted(tweet: tweepy.models.Status):
         return tweet.is_quote_status
 
     @staticmethod
-    def _get_photo_url(media):
+    def _get_photo_url(media: dict):
         if 'media_url_https' in media:
             return media['media_url_https']
         elif 'media_url' in media:
@@ -62,7 +62,7 @@ class Twitter:
         return ""
 
     @staticmethod
-    def _get_video_url(media):
+    def _get_video_url(media: dict):
         bitrate = 0
         index = 0
         for i, video in enumerate(media['video_info']['variants']):
@@ -76,7 +76,7 @@ class Twitter:
         return ""
 
     @staticmethod
-    def _has_instagram_url(entities):
+    def _has_instagram_url(entities: dict):
         if 'urls' not in entities:
             return False
 
@@ -89,7 +89,7 @@ class Twitter:
         return False
 
     @staticmethod
-    def _get_instagram_url(entities):
+    def _get_instagram_url(entities: dict):
         for url in entities['urls']:
             if 'expanded_url' in url and url['expanded_url'].startswith('https://www.instagram.com'):
                 return url['expanded_url']
@@ -98,7 +98,7 @@ class Twitter:
 
         return ""
 
-    def _get_twitter_media_urls(self, extended_entities):
+    def _get_twitter_media_urls(self, extended_entities: dict):
         if 'media' not in extended_entities:
             return []
 
@@ -115,7 +115,7 @@ class Twitter:
 
         return media_url_list
 
-    def get_media_tweets(self, tweet):
+    def get_media_tweets(self, tweet: tweepy.models.Status):
         media_tweet_dict = {}
 
         tweet_status = tweet
@@ -147,17 +147,17 @@ class Twitter:
         return media_tweet_dict
 
     @staticmethod
-    def make_tweet_permalink(tweet_status):
+    def make_tweet_permalink(tweet_status: tweepy.models.Status):
         return f'https://twitter.com/{tweet_status.user.screen_name}/status/{tweet_status.id_str}'
 
     @staticmethod
-    def make_tweet_description(tweet_status):
+    def make_tweet_description(tweet_status: tweepy.models.Status):
         return f'{tweet_status.user.name}\n' \
                f'@{tweet_status.user.screen_name}\n' \
                f'{tweet_status.full_text}'
 
     @classmethod
-    def show_media_info(cls, tweet_status_media_dict):
+    def show_media_info(cls, tweet_status_media_dict: dict):
         tweet_status = tweet_status_media_dict['tweet_status']
         urls = tweet_status_media_dict['urls']
         print(f'user_id={tweet_status.user.screen_name}, tweet_date={str(tweet_status.created_at)}, '
@@ -168,7 +168,7 @@ class Twitter:
         for _, tweet_status_media_dict in media_tweet_dict.items():
             cls.show_media_info(tweet_status_media_dict)
 
-    def show_tweet_media(self, tweet):
+    def show_tweet_media(self, tweet: tweepy.models.Status):
         print('################## ', self.make_tweet_permalink(tweet))
         medias = {}
         try:
@@ -181,7 +181,7 @@ class Twitter:
         else:
             print('no media')
 
-    def show_favorite_tweet_media(self, user):
+    def show_favorite_tweet_media(self, user: TwitterUser):
         for tweets in self.limit_handled(tweepy.Cursor(self.api.favorites,
                                                        id=user.id,
                                                        tweet_mode='extended').pages(self.tweet_page)):
@@ -207,7 +207,7 @@ class Twitter:
 
         return media_tweet_dicts
 
-    def show_rt_media(self, user):
+    def show_rt_media(self, user: TwitterUser):
         for tweets in self.limit_handled(tweepy.Cursor(self.api.user_timeline,
                                                        id=user.id,
                                                        tweet_mode='extended',
@@ -223,7 +223,7 @@ class Twitter:
                     continue
                 self.show_tweet_media(tweet)
 
-    def get_rt_media(self, user):
+    def get_rt_media(self, user: TwitterUser):
         media_tweet_dicts = {}
         for tweets in self.limit_handled(tweepy.Cursor(self.api.user_timeline,
                                                        id=user.id,
@@ -253,7 +253,7 @@ class Twitter:
 
         return media_tweet_dicts
 
-    def get_target_tweets(self, user):
+    def get_target_tweets(self, user: TwitterUser):
         target_tweets_dict = {}
         if 'fav' in self.mode:
             new_fav_result = self.get_favorite_media(user)
