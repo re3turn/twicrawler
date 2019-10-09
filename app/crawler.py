@@ -30,7 +30,7 @@ class Crawler:
     def download_media(media_url: str, download_path: str):
         urllib.request.urlretrieve(media_url, download_path)
 
-    def upload_google_photos(self, media_path: str, description: str):
+    def upload_google_photos(self, media_path: str, description: str) -> bool:
         while True:
             try:
                 self.google_photos.upload_media(media_path, description)
@@ -47,7 +47,7 @@ class Crawler:
 
         return True
 
-    def make_download_path(self, url: str):
+    def make_download_path(self, url: str) -> str:
         url = re.sub(r'\?.*$', '', url)
         return f'{self._download_dir}/{os.path.basename(url)}'
 

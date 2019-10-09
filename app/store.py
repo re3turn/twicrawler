@@ -3,6 +3,7 @@
 import psycopg2
 import pytz
 import traceback
+import typing
 
 from datetime import datetime
 from app.env import Env
@@ -22,7 +23,7 @@ class Store:
             except pytz.UnknownTimeZoneError:
                 self._tz = pytz.timezone(pytz.utc.zone)
 
-    def _get_connection(self):
+    def _get_connection(self) -> typing.Optional[psycopg2.extensions.connection]:
         try:
             connection = psycopg2.connect(self._db_url, sslmode=self._sslmode)
         except Exception as e:
