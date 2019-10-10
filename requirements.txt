@@ -1,9 +1,10 @@
 beautifulsoup4 >= 4.8.0
 google-api-python-client
+google-auth-httplib2
 google-auth-oauthlib
+google-oauth
 httplib2
 nose2 >= 0.9.1
-oauth2client
 psycopg2-binary >= 2.8.3
 pytz >= 2019.2
 requests
