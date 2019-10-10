@@ -170,7 +170,7 @@ class Twitter:
 
     def show_tweet_media(self, tweet: tweepy.models.Status):
         print('################## ', self.make_tweet_permalink(tweet))
-        medias = {}
+        medias: dict = {}
         try:
             medias = self.get_media_tweets(tweet)
         except Exception as e:
