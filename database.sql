@@ -8,5 +8,10 @@ create table uploaded_media_tweet
     tweet_date text not null
 );
 
-create unique index uploaded_media_tweet_tweet_id_uindex
-    on uploaded_media_tweet (tweet_id);
+create table failed_upload_media
+(
+    url         text not null
+        constraint failed_upload_media_pk
+            primary key,
+    description text not null
+);
