@@ -3,7 +3,7 @@
 import os
 import googleapiclient.errors
 
-from typing import IO
+from typing import IO, Dict
 from retry import retry
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -24,13 +24,13 @@ class GoogleApiResponseNG(Exception):
 
 
 class GooglePhotos:
-    def __init__(self):
+    def __init__(self) -> None:
         self.credentials = self.make_credentials()
         self.service = build(API_SERVICE_NAME, API_VERSION, credentials=self.credentials)
         self.authorized_http = AuthorizedHttp(credentials=self.credentials)
 
     @staticmethod
-    def get_access_token():
+    def get_access_token() -> None:
         client_id = Env.get_environment('GOOGLE_CLIENT_ID', required=True)
         client_secret = Env.get_environment('GOOGLE_CLIENT_SECRET', required=True)
         client_config = {
@@ -62,7 +62,7 @@ class GooglePhotos:
         )
 
     @retry(googleapiclient.errors.HttpError, tries=3, delay=2, backoff=2)
-    def create_media_item(self, new_item: dict) -> dict:
+    def create_media_item(self, new_item: dict) -> Dict[str, str]:
         response = self.service.mediaItems().batchCreate(body=new_item).execute()
         status = response['newMediaItemResults'][0]['status']
         return status
@@ -83,7 +83,7 @@ class GooglePhotos:
             raise GoogleApiResponseNG(f'Google API response NG, status={response.status}, content={upload_token}')
         return upload_token.decode('utf-8')
 
-    def upload_media(self, file_path, description):
+    def upload_media(self, file_path: str, description: str) -> Dict[str, str]:
         upload_token = self._execute_upload_api(file_path=file_path)
 
         new_item = {

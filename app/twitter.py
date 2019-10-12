@@ -4,28 +4,28 @@ import re
 import traceback
 import tweepy
 import time
-
+from typing import Iterator, List
 from app.env import Env
 from app.instagram import Instagram
 
 
 class TwitterUser(object):
-    def __init__(self, user_id: str):
+    def __init__(self, user_id: str) -> None:
         self.id = user_id
         self.since_id = 1
 
 
 class Twitter:
-    def __init__(self):
-        self.tweet_page = int(Env.get_environment('TWEET_PAGES', default='25'))
-        self.tweet_count = int(Env.get_environment('TWEET_COUNT', default='200'))
-        self.mode = Env.get_environment('MODE_SPECIFIED', default='rt')
-        self._last_fav_result = {}
+    def __init__(self) -> None:
+        self.tweet_page: int = int(Env.get_environment('TWEET_PAGES', default='25'))
+        self.tweet_count: int = int(Env.get_environment('TWEET_COUNT', default='200'))
+        self.mode: str = Env.get_environment('MODE_SPECIFIED', default='rt')
+        self._last_fav_result: dict = {}
 
-        consumer_key = Env.get_environment('TWITTER_CONSUMER_KEY', required=True)
-        consumer_secret = Env.get_environment('TWITTER_CONSUMER_SECRET', required=True)
-        access_token = Env.get_environment('TWITTER_ACCESS_TOKEN', required=True)
-        access_token_secret = Env.get_environment('TWITTER_ACCESS_TOKEN_SECRET', required=True)
+        consumer_key: str = Env.get_environment('TWITTER_CONSUMER_KEY', required=True)
+        consumer_secret: str = Env.get_environment('TWITTER_CONSUMER_SECRET', required=True)
+        access_token: str = Env.get_environment('TWITTER_ACCESS_TOKEN', required=True)
+        access_token_secret: str = Env.get_environment('TWITTER_ACCESS_TOKEN_SECRET', required=True)
 
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         auth.set_access_token(access_token, access_token_secret)
@@ -41,7 +41,7 @@ class Twitter:
         return url + '?name=orig'
 
     @staticmethod
-    def limit_handled(page: tweepy.cursor.IdIterator):
+    def limit_handled(page: tweepy.cursor.IdIterator) -> Iterator[tweepy.models.ResultSet]:
         while True:
             try:
                 yield page.next()
@@ -98,7 +98,7 @@ class Twitter:
 
         return ""
 
-    def _get_twitter_media_urls(self, extended_entities: dict) -> list:
+    def _get_twitter_media_urls(self, extended_entities: dict) -> List[str]:
         if 'media' not in extended_entities:
             return []
 
@@ -115,7 +115,7 @@ class Twitter:
 
         return media_url_list
 
-    def get_media_tweets(self, tweet: tweepy.models.Status) -> dict:
+    def get_media_tweets(self, tweet: tweepy.Status) -> dict:
         media_tweet_dict = {}
 
         tweet_status = tweet
@@ -157,18 +157,18 @@ class Twitter:
                f'{tweet_status.full_text}'
 
     @classmethod
-    def show_media_info(cls, tweet_status_media_dict: dict):
+    def show_media_info(cls, tweet_status_media_dict: dict) -> None:
         tweet_status = tweet_status_media_dict['tweet_status']
         urls = tweet_status_media_dict['urls']
         print(f'user_id={tweet_status.user.screen_name}, tweet_date={str(tweet_status.created_at)}, '
               f'permalink={cls.make_tweet_permalink(tweet_status)}, media_urls={urls}')
 
     @classmethod
-    def show_media_infos(cls, media_tweet_dict):
+    def show_media_infos(cls, media_tweet_dict: dict) -> None:
         for _, tweet_status_media_dict in media_tweet_dict.items():
             cls.show_media_info(tweet_status_media_dict)
 
-    def show_tweet_media(self, tweet: tweepy.models.Status):
+    def show_tweet_media(self, tweet: tweepy.models.Status) -> None:
         print('################## ', self.make_tweet_permalink(tweet))
         medias: dict = {}
         try:
@@ -181,21 +181,21 @@ class Twitter:
         else:
             print('no media')
 
-    def show_favorite_tweet_media(self, user: TwitterUser):
+    def show_favorite_tweet_media(self, user: TwitterUser) -> None:
         for tweets in self.limit_handled(tweepy.Cursor(self.api.favorites,
                                                        id=user.id,
                                                        tweet_mode='extended').pages(self.tweet_page)):
             for tweet in tweets:
                 self.show_tweet_media(tweet)
 
-    def get_favorite_media(self, user: TwitterUser):
+    def get_favorite_media(self, user: TwitterUser) -> dict:
         media_tweet_dicts = {}
         for tweets in self.limit_handled(tweepy.Cursor(self.api.favorites,
                                                        id=user.id,
                                                        count=self.tweet_count,
                                                        tweet_mode="extended").pages(self.tweet_page)):
             for tweet in tweets:
-                media_tweet_dict = None
+                media_tweet_dict: dict = {}
                 try:
                     media_tweet_dict = self.get_media_tweets(tweet)
                 except Exception as e:
@@ -207,7 +207,7 @@ class Twitter:
 
         return media_tweet_dicts
 
-    def show_rt_media(self, user: TwitterUser):
+    def show_rt_media(self, user: TwitterUser) -> None:
         for tweets in self.limit_handled(tweepy.Cursor(self.api.user_timeline,
                                                        id=user.id,
                                                        tweet_mode='extended',

@@ -3,19 +3,19 @@
 import psycopg2
 import pytz
 import traceback
-import typing
+from typing import Optional, Any, List
 
 from datetime import datetime
 from app.env import Env
 
 
 class Store:
-    def __init__(self):
-        self._db_url = Env.get_environment('DATABASE_URL', required=True)
-        self._sslmode = Env.get_environment('DATABASE_SSLMODE', default='require', required=False)
-        self._connection = self._get_connection()
-        timezone = Env.get_environment('TZ')
-        if timezone is None:
+    def __init__(self) -> None:
+        self._db_url: str = Env.get_environment('DATABASE_URL', required=True)
+        self._sslmode: str = Env.get_environment('DATABASE_SSLMODE', default='require', required=False)
+        self._connection: Any = self._get_connection()
+        timezone: str = Env.get_environment('TZ')
+        if timezone == '':
             self._tz = pytz.timezone(pytz.utc.zone)
         else:
             try:
@@ -23,7 +23,7 @@ class Store:
             except pytz.UnknownTimeZoneError:
                 self._tz = pytz.timezone(pytz.utc.zone)
 
-    def _get_connection(self) -> typing.Optional[psycopg2.extensions.connection]:
+    def _get_connection(self) -> Optional[psycopg2.extensions.connection]:
         try:
             connection = psycopg2.connect(self._db_url, sslmode=self._sslmode)
         except Exception as e:
@@ -34,7 +34,7 @@ class Store:
         connection.autocommit = True
         return connection
 
-    def insert_tweet_info(self, tweet_id: str, user_id: str, tweet_date: str):
+    def insert_tweet_info(self, tweet_id: str, user_id: str, tweet_date: str) -> None:
         add_date = datetime.now(self._tz).strftime('%Y-%m-%d %H:%M:%S')
         with self._connection.cursor() as cursor:
             cursor.execute(
@@ -42,7 +42,7 @@ class Store:
                 'VALUES (%s, %s, %s, %s)',
                 (tweet_id, user_id, tweet_date, add_date))
 
-    def fetch_not_added_tweets(self, tweets: list) -> list:
+    def fetch_not_added_tweets(self, tweets: list) -> List[str]:
         with self._connection.cursor() as cursor:
             cursor.execute(
                 'SELECT T2.tweet_id '

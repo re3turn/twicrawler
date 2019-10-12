@@ -18,7 +18,7 @@ from app.twitter import Twitter, TwitterUser
 
 
 class Crawler:
-    def __init__(self):
+    def __init__(self) -> None:
         self.twitter = Twitter()
         self.store = Store()
         self.google_photos = GooglePhotos()
@@ -27,7 +27,7 @@ class Crawler:
 
     @staticmethod
     @retry(urllib.error.HTTPError, tries=3, delay=2, backoff=2)
-    def download_media(media_url: str, download_path: str):
+    def download_media(media_url: str, download_path: str) -> None:
         urllib.request.urlretrieve(media_url, download_path)
 
     def upload_google_photos(self, media_path: str, description: str) -> bool:
@@ -51,7 +51,7 @@ class Crawler:
         url = re.sub(r'\?.*$', '', url)
         return f'{self._download_dir}/{os.path.basename(url)}'
 
-    def backup_media(self, media_tweet_dicts: dict):
+    def backup_media(self, media_tweet_dicts: dict) -> None:
         if not media_tweet_dicts:
             return
 
@@ -90,12 +90,12 @@ class Crawler:
                 print(f'Insert failed. tweet_id={tweet_id}', e.args, file=sys.stderr)
                 traceback.print_exc()
 
-    def crawling_tweets(self, user: TwitterUser):
+    def crawling_tweets(self, user: TwitterUser) -> None:
         media_tweet_dicts = self.twitter.get_target_tweets(user)
         self.backup_media(media_tweet_dicts)
 
-    def main(self):
-        interval_minutes = int(Env.get_environment('INTERVAL', default='5'))
+    def main(self) -> None:
+        interval_minutes: int = int(Env.get_environment('INTERVAL', default='5'))
         user_ids = Env.get_environment('TWITTER_USER_IDS', required=True)
 
         user_list = [TwitterUser(user_id) for user_id in user_ids.split(',')]

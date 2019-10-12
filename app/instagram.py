@@ -4,25 +4,26 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import re
+from typing import Any, List
 
 
 class Instagram:
-    def __init__(self, url):
+    def __init__(self, url: str) -> None:
         self.url = url
 
-    def _get_json_data(self):
+    def _get_json_data(self) -> Any:
 
         res = requests.get(self.url)
         html = BeautifulSoup(res.content, 'html.parser')
 
         pattern = re.compile('window._sharedData = ({.*?});')
         script = html.find('script', text=pattern)
-        data = pattern.search(script.text).group(1)
+        data = pattern.search(script.text).group(1)  # type: ignore
         json_user_data = json.loads(data)
 
         return json_user_data
 
-    def get_media_urls(self):
+    def get_media_urls(self) -> List[str]:
         json_data = self._get_json_data()
 
         if 'entry_data' not in json_data:
