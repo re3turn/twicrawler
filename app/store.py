@@ -5,6 +5,8 @@ import pytz
 import traceback
 
 from datetime import datetime
+from typing import Tuple, List
+
 from app.env import Env
 
 
@@ -41,6 +43,13 @@ class Store:
                 'VALUES (%s, %s, %s, %s)',
                 (tweet_id, user_id, tweet_date, add_date))
 
+    def insert_failed_upload_media(self, url: str, description: str) -> None:
+        with self._connection.cursor() as cursor:
+            cursor.execute(
+                'INSERT INTO failed_upload_media (url, description)'
+                'VALUES (%s, %s)',
+                (url, description))
+
     def fetch_not_added_tweets(self, tweets: list) -> list:
         with self._connection.cursor() as cursor:
             cursor.execute(
@@ -53,6 +62,19 @@ class Store:
                 (tweets,))
             return cursor.fetchall()
 
+    def fetch_all_failed_upload_medias(self) -> List[Tuple[str, str]]:
+        with self._connection.cursor() as cursor:
+            cursor.execute(
+                'SELECT url, description '
+                'FROM failed_upload_media')
+            return cursor.fetchall()
+
+    def delete_failed_upload_media(self, url: str) -> None:
+        with self._connection.cursor() as cursor:
+            cursor.execute(
+                'DELETE FROM failed_upload_media '
+                'WHERE url = %s',
+                (url,))
 
 if __name__ == '__main__':
     db = Store()
