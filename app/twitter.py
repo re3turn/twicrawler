@@ -242,8 +242,11 @@ class Twitter:
                     continue
                 if not tweet.retweeted_status:
                     continue
-                if 'mixed' in self.mode and not hasattr(tweet, 'favorited'):
-                    continue
+                if 'mixed' in self.mode:
+                    if not hasattr(tweet.retweeted_status, 'favorited'):
+                        continue
+                    if not tweet.retweeted_status.favorited:
+                        continue
 
                 tweet_medias: Dict[str, TweetMedia] = {}
                 try:
