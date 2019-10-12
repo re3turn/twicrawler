@@ -1,18 +1,24 @@
 #!/usr/bin/python3
 
+import dataclasses
 import re
 import traceback
 import tweepy
-import time
-from typing import Iterator, List
+from typing import Iterator, List, Dict
 from app.env import Env
 from app.instagram import Instagram
 
 
+@dataclasses.dataclass
 class TwitterUser(object):
-    def __init__(self, user_id: str) -> None:
-        self.id = user_id
-        self.since_id = 1
+    id: str = ''
+    since_id: int = 1
+
+
+@dataclasses.dataclass
+class TweetMedia(object):
+    urls: List[str]
+    tweet: tweepy.Status
 
 
 class Twitter:
@@ -20,7 +26,7 @@ class Twitter:
         self.tweet_page: int = int(Env.get_environment('TWEET_PAGES', default='25'))
         self.tweet_count: int = int(Env.get_environment('TWEET_COUNT', default='200'))
         self.mode: str = Env.get_environment('MODE_SPECIFIED', default='rt')
-        self._last_fav_result: dict = {}
+        self._last_fav_result: Dict[str, TweetMedia] = {}
 
         consumer_key: str = Env.get_environment('TWITTER_CONSUMER_KEY', required=True)
         consumer_secret: str = Env.get_environment('TWITTER_CONSUMER_SECRET', required=True)
@@ -49,7 +55,7 @@ class Twitter:
                 break
 
     @staticmethod
-    def is_quoted(tweet: tweepy.models.Status) -> bool:
+    def is_quoted(tweet: tweepy.Status) -> bool:
         return tweet.is_quote_status
 
     @staticmethod
@@ -115,70 +121,67 @@ class Twitter:
 
         return media_url_list
 
-    def get_media_tweets(self, tweet: tweepy.Status) -> dict:
-        # TODO: -> Dict[str, Tuple[tweepy.Status, List[str]]]
-        media_tweet_dict = {}
+    def get_tweet_medias(self, tweet: tweepy.Status) -> Dict[str, TweetMedia]:
+        tweet_medias = {}
 
-        tweet_status = tweet
+        target_tweet = tweet
         if hasattr(tweet, 'retweeted_status'):
-            tweet_status = tweet.retweeted_status
+            target_tweet = tweet.retweeted_status
 
-        if self.is_quoted(tweet_status) and hasattr(tweet_status, 'quoted_status'):
-            media_tweet_dict.update(self.get_media_tweets(tweet_status.quoted_status))
+        if self.is_quoted(target_tweet) and hasattr(target_tweet, 'quoted_status'):
+            tweet_medias.update(self.get_tweet_medias(target_tweet.quoted_status))
 
-        if hasattr(tweet_status, 'extended_entities') and 'media' in tweet_status.extended_entities:
+        if hasattr(target_tweet, 'extended_entities') and 'media' in target_tweet.extended_entities:
             media_type = 'Twitter'
-        elif hasattr(tweet_status, 'entities') and self._has_instagram_url(tweet_status.entities):
+        elif hasattr(target_tweet, 'entities') and self._has_instagram_url(target_tweet.entities):
             media_type = 'Instagram'
         else:
             return {}
 
         if media_type == 'Twitter':
-            extended_entities = tweet_status.extended_entities
+            extended_entities = target_tweet.extended_entities
             media_url_list = self._get_twitter_media_urls(extended_entities)
         elif media_type == 'Instagram':
-            media_url_list = Instagram(self._get_instagram_url(tweet_status.entities)).get_media_urls()
+            media_url_list = Instagram(self._get_instagram_url(target_tweet.entities)).get_media_urls()
         else:
             return {}
 
-        tweet_status_media_dict = dict(tweet_status=tweet_status, urls=media_url_list)
+        tweet_medias = {target_tweet.id_str: TweetMedia(urls=media_url_list, tweet=target_tweet)}
 
-        media_tweet_dict[tweet_status.id_str] = tweet_status_media_dict
-
-        return media_tweet_dict
+        return tweet_medias
 
     @staticmethod
-    def make_tweet_permalink(tweet_status: tweepy.models.Status) -> str:
-        return f'https://twitter.com/{tweet_status.user.screen_name}/status/{tweet_status.id_str}'
+    def make_tweet_permalink(tweet: tweepy.Status) -> str:
+        return f'https://twitter.com/{tweet.user.screen_name}/status/{tweet.id_str}'
 
     @staticmethod
-    def make_tweet_description(tweet_status: tweepy.models.Status) -> str:
-        return f'{tweet_status.user.name}\n' \
-               f'@{tweet_status.user.screen_name}\n' \
-               f'{tweet_status.full_text}'
+    def make_tweet_description(tweet: tweepy.Status) -> str:
+        return f'{tweet.user.name}\n' \
+               f'@{tweet.user.screen_name}\n' \
+               f'{tweet.full_text}'
 
     @classmethod
-    def show_media_info(cls, tweet_status_media_dict: dict) -> None:
-        tweet_status = tweet_status_media_dict['tweet_status']
-        urls = tweet_status_media_dict['urls']
-        print(f'user_id={tweet_status.user.screen_name}, tweet_date={str(tweet_status.created_at)}, '
-              f'permalink={cls.make_tweet_permalink(tweet_status)}, media_urls={urls}')
+    def show_media_info(cls, tweet_media: TweetMedia) -> None:
+        tweet: tweepy.Status = tweet_media.tweet
+        urls: List[str] = tweet_media.urls
+        print(f'user_id={tweet.user.screen_name}, tweet_date={str(tweet.created_at)}, '
+              f'permalink={cls.make_tweet_permalink(tweet)}, media_urls={urls}')
 
     @classmethod
-    def show_media_infos(cls, media_tweet_dict: dict) -> None:
-        for _, tweet_status_media_dict in media_tweet_dict.items():
-            cls.show_media_info(tweet_status_media_dict)
+    def show_media_infos(cls, tweet_medias: Dict[str, TweetMedia]) -> None:
+        for _, tweet_media in tweet_medias.items():
+            cls.show_media_info(tweet_media)
 
-    def show_tweet_media(self, tweet: tweepy.models.Status) -> None:
+    def show_tweet_media(self, tweet: tweepy.Status) -> None:
         print('################## ', self.make_tweet_permalink(tweet))
-        medias: dict = {}
+        tweet_medias: Dict[str, TweetMedia] = {}
         try:
-            medias = self.get_media_tweets(tweet)
+            tweet_medias = self.get_tweet_medias(tweet)
         except Exception as e:
             print(e.args)
             traceback.print_exc()
-        if medias:
-            self.show_media_infos(medias)
+        if tweet_medias:
+            self.show_media_infos(tweet_medias)
         else:
             print('no media')
 
@@ -189,24 +192,24 @@ class Twitter:
             for tweet in tweets:
                 self.show_tweet_media(tweet)
 
-    def get_favorite_media(self, user: TwitterUser) -> dict:
-        media_tweet_dicts = {}
+    def get_favorite_media(self, user: TwitterUser) -> Dict[str, TweetMedia]:
+        fav_twitter_medias: Dict[str, TweetMedia] = {}
         for tweets in self.limit_handled(tweepy.Cursor(self.api.favorites,
                                                        id=user.id,
                                                        count=self.tweet_count,
                                                        tweet_mode="extended").pages(self.tweet_page)):
             for tweet in tweets:
-                media_tweet_dict: dict = {}
+                tweet_medias: Dict[str, TweetMedia] = {}
                 try:
-                    media_tweet_dict = self.get_media_tweets(tweet)
+                    tweet_medias = self.get_tweet_medias(tweet)
                 except Exception as e:
                     print(e.args)
                     traceback.print_exc()
 
-                if media_tweet_dict:
-                    media_tweet_dicts.update(media_tweet_dict)
+                if tweet_medias:
+                    fav_twitter_medias.update(tweet_medias)
 
-        return media_tweet_dicts
+        return fav_twitter_medias
 
     def show_rt_media(self, user: TwitterUser) -> None:
         for tweets in self.limit_handled(tweepy.Cursor(self.api.user_timeline,
@@ -224,8 +227,8 @@ class Twitter:
                     continue
                 self.show_tweet_media(tweet)
 
-    def get_rt_media(self, user: TwitterUser) -> dict:
-        media_tweet_dicts = {}
+    def get_rt_media(self, user: TwitterUser) -> Dict[str, TweetMedia]:
+        rt_tweet_medias: Dict[str, TweetMedia] = {}
         for tweets in self.limit_handled(tweepy.Cursor(self.api.user_timeline,
                                                        id=user.id,
                                                        tweet_mode='extended',
@@ -242,32 +245,32 @@ class Twitter:
                 if 'mixed' in self.mode and not hasattr(tweet, 'favorited'):
                     continue
 
-                media_tweet_dict = None
+                tweet_medias: Dict[str, TweetMedia] = {}
                 try:
-                    media_tweet_dict = self.get_media_tweets(tweet)
+                    tweet_medias = self.get_tweet_medias(tweet)
                 except Exception as e:
                     print(e.args)
                     traceback.print_exc()
 
-                if media_tweet_dict:
-                    media_tweet_dicts.update(media_tweet_dict)
+                if tweet_medias:
+                    rt_tweet_medias.update(tweet_medias)
 
-        return media_tweet_dicts
+        return rt_tweet_medias
 
     def get_target_tweets(self, user: TwitterUser) -> dict:
-        target_tweets_dict = {}
+        target_tweet_medias: Dict[str, TweetMedia] = {}
         if 'fav' in self.mode:
             new_fav_result = self.get_favorite_media(user)
             # valueにdict(unhashable)があるためitems()で差集合が計算できない。ので、keys()で計算する。
             diff_keys = new_fav_result.keys() - self._last_fav_result.keys()
-            target_tweets_dict.update({k:new_fav_result[k] for k in diff_keys})
+            target_tweet_medias.update({k: new_fav_result[k] for k in diff_keys})
             self._last_fav_result = new_fav_result
         if 'rt' in self.mode or 'mixed' in self.mode:
-            target_tweets_dict.update(self.get_rt_media(user))
-        return target_tweets_dict
+            target_tweet_medias.update(self.get_rt_media(user))
+        return target_tweet_medias
 
 
 if __name__ == '__main__':
-    twitter_user = TwitterUser(user_id='TwitterJP')
+    twitter_user = TwitterUser(id='TwitterJP')
     t = Twitter()
     t.show_rt_media(twitter_user)
