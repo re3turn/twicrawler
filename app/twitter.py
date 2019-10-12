@@ -240,9 +240,9 @@ class Twitter:
                 if not tweet.retweeted_status:
                     continue
                 if 'mixed' in self.mode:
-                    if not hasattr(tweet, 'favorited'):
+                    if not hasattr(tweet.retweeted_status, 'favorited'):
                         continue
-                    if not tweet.favorited:
+                    if not tweet.retweeted_status.favorited:
                         continue
                 media_tweet_dict = None
                 try:
