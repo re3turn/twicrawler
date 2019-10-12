@@ -76,7 +76,7 @@ class Crawler:
 
         return True
 
-    def backup_media(self, media_tweet_dicts):
+    def backup_media(self, media_tweet_dicts: dict) -> None:
         if not media_tweet_dicts:
             return
 
@@ -127,7 +127,7 @@ class Crawler:
             print(f'Retry backup failed. failed_url={url}', e.args, file=sys.stderr)
             traceback.print_exc()
 
-    def crawling_tweets(self, user):
+    def crawling_tweets(self, user: TwitterUser) -> None:
         media_tweet_dicts = self.twitter.get_target_tweets(user)
         self.backup_media(media_tweet_dicts)
         self.retry_backup_media()
