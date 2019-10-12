@@ -239,9 +239,11 @@ class Twitter:
                     continue
                 if not tweet.retweeted_status:
                     continue
-                if 'mixed' in self.mode and not hasattr(tweet, 'favorited'):
-                    continue
-
+                if 'mixed' in self.mode:
+                    if not hasattr(tweet, 'favorited'):
+                        continue
+                    if not tweet.favorited:
+                        continue
                 media_tweet_dict = None
                 try:
                     media_tweet_dict = self.get_media_tweets(tweet)
