@@ -51,7 +51,7 @@ class Store:
                 'VALUES (%s, %s)',
                 (url, description))
 
-    def fetch_not_added_tweets(self, tweets: list) -> List[str]:
+    def fetch_not_added_tweets(self, tweets: List[str]) -> List[str]:
         with self._connection.cursor() as cursor:
             cursor.execute(
                 'SELECT T2.tweet_id '
