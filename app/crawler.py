@@ -75,12 +75,13 @@ class Crawler:
 
                 # upload
                 is_uploaded = self.upload_google_photos(download_path, Twitter.make_tweet_description(tweet_status))
-                if not is_uploaded:
-                    print(f'upload failed. tweet_id={tweet_id}, media_url={url}', file=sys.stderr)
-                    continue
 
                 # delete
                 os.remove(download_path)
+
+                if not is_uploaded:
+                    print(f'upload failed. tweet_id={tweet_id}, media_url={url}', file=sys.stderr)
+                    continue
 
             # store update
             try:

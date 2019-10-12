@@ -67,7 +67,7 @@ class GooglePhotos:
         status = response['newMediaItemResults'][0]['status']
         return status
 
-    @retry((GoogleApiResponseNG, ConnectionAbortedError, TimeoutError), tries=3, delay=2, backoff=2)
+    @retry((GoogleApiResponseNG, ConnectionError, TimeoutError), tries=3, delay=2, backoff=2)
     def _execute_upload_api(self, file_path: str) -> str:
         with open(file_path, 'rb') as file_data:
             headers = {
