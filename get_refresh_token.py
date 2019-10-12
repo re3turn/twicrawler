@@ -3,7 +3,7 @@
 from app import google_photos
 
 
-def main():
+def main() -> None:
     google_photos.GooglePhotos.get_access_token()
 
 

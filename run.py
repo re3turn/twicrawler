@@ -3,7 +3,7 @@
 from app import crawler
 
 
-def main():
+def main() -> None:
     crawler.Crawler().main()
 
 
