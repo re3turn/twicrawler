@@ -108,7 +108,7 @@ class Twitter:
         if 'media' not in extended_entities:
             return []
 
-        media_url_list = []
+        media_url_list: List[str] = []
         url = ""
         for media in extended_entities['media']:
             if media['type'] == 'photo':
@@ -122,7 +122,7 @@ class Twitter:
         return media_url_list
 
     def get_tweet_medias(self, tweet: tweepy.Status) -> Dict[str, TweetMedia]:
-        tweet_medias = {}
+        tweet_medias: Dict[str, TweetMedia] = {}
 
         target_tweet = tweet
         if hasattr(tweet, 'retweeted_status'):
