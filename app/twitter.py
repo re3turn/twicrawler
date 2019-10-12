@@ -119,7 +119,7 @@ class Twitter:
         media_tweet_dict = {}
 
         tweet_status = tweet
-        if tweet.retweeted and hasattr(tweet, 'retweeted_status'):
+        if hasattr(tweet, 'retweeted_status'):
             tweet_status = tweet.retweeted_status
 
         if self.is_quoted(tweet_status) and hasattr(tweet_status, 'quoted_status'):
