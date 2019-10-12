@@ -4,3 +4,4 @@ __pycache__/
 download/
 app/*.json
 .env
+.mypy_cache/
