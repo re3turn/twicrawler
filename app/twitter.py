@@ -116,6 +116,7 @@ class Twitter:
         return media_url_list
 
     def get_media_tweets(self, tweet: tweepy.Status) -> dict:
+        # TODO: -> Dict[str, Tuple[tweepy.Status, List[str]]]
         media_tweet_dict = {}
 
         tweet_status = tweet
