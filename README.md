@@ -1,7 +1,7 @@
 # Installation
 
 ## Requirement
- - python3.6.* or 3.7.*
+ - python3.7.*
  - PostgreSQL
  - Twitter APIs
  - Google APIs
