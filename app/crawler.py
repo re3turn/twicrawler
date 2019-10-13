@@ -8,22 +8,23 @@ import traceback
 import urllib.request
 import urllib.error
 
+import tweepy
 from googleapiclient.errors import HttpError
 from retry import retry
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 from app.env import Env
 from app.google_photos import GooglePhotos
 from app.store import Store
-from app.twitter import Twitter, TwitterUser
+from app.twitter import Twitter, TwitterUser, TweetMedia
 
 
 class Crawler:
     def __init__(self) -> None:
-        self.twitter = Twitter()
-        self.store = Store()
-        self.google_photos = GooglePhotos()
-        self._download_dir = './download'
+        self.twitter: Twitter = Twitter()
+        self.store: Store = Store()
+        self.google_photos: GooglePhotos = GooglePhotos()
+        self._download_dir: str = './download'
         os.makedirs(self._download_dir, exist_ok=True)
 
     @staticmethod
@@ -76,19 +77,19 @@ class Crawler:
 
         return True
 
-    def backup_media(self, media_tweet_dicts: dict) -> None:
-        if not media_tweet_dicts:
+    def backup_media(self, tweet_medias: Dict[str, TweetMedia]) -> None:
+        if not tweet_medias:
             return
 
-        target_tweet_ids = self.store.fetch_not_added_tweets(list(media_tweet_dicts.keys()))
+        target_tweet_ids = self.store.fetch_not_added_tweets(list(tweet_medias.keys()))
         for tweet_id, in target_tweet_ids:
-            tweet_status_media_dict = media_tweet_dicts[tweet_id]
-            tweet_status = tweet_status_media_dict['tweet_status']
+            target_tweet_media: TweetMedia = tweet_medias[tweet_id]
+            target_tweet: tweepy.Status = target_tweet_media.tweet
             failed_upload_medias: List[Tuple[str, str]] = []
 
-            Twitter.show_media_info(tweet_status_media_dict)
-            for url in tweet_status_media_dict['urls']:
-                description: str = Twitter.make_tweet_description(tweet_status)
+            target_tweet_media.show_info()
+            for url in target_tweet_media.urls:
+                description: str = Twitter.make_tweet_description(target_tweet)
                 is_saved: bool = self.save_media(url, description)
                 if not is_saved:
                     failed_upload_medias.append((url, description))
@@ -97,7 +98,7 @@ class Crawler:
 
             # store update
             try:
-                self.store.insert_tweet_info(tweet_id, tweet_status.user.screen_name, str(tweet_status.created_at))
+                self.store.insert_tweet_info(tweet_id, target_tweet.user.screen_name, str(target_tweet.created_at))
             except Exception as e:
                 print(f'Insert failed. tweet_id={tweet_id}', e.args, file=sys.stderr)
                 traceback.print_exc()
@@ -128,15 +129,15 @@ class Crawler:
             traceback.print_exc()
 
     def crawling_tweets(self, user: TwitterUser) -> None:
-        media_tweet_dicts = self.twitter.get_target_tweets(user)
-        self.backup_media(media_tweet_dicts)
+        target_tweet_medias: Dict[str, TweetMedia] = self.twitter.get_target_tweets(user)
+        self.backup_media(target_tweet_medias)
         self.retry_backup_media()
 
     def main(self) -> None:
         interval_minutes: int = int(Env.get_environment('INTERVAL', default='5'))
-        user_ids = Env.get_environment('TWITTER_USER_IDS', required=True)
+        user_ids: str = Env.get_environment('TWITTER_USER_IDS', required=True)
 
-        user_list = [TwitterUser(user_id) for user_id in user_ids.split(',')]
+        user_list: List[TwitterUser] = [TwitterUser(id=user_id) for user_id in user_ids.split(',')]
 
         while True:
             try:

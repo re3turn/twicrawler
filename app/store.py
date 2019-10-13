@@ -3,7 +3,7 @@
 import psycopg2
 import pytz
 import traceback
-from typing import Optional, Any, List
+from typing import Optional, Any
 
 from datetime import datetime
 from typing import Tuple, List
@@ -37,7 +37,7 @@ class Store:
         return connection
 
     def insert_tweet_info(self, tweet_id: str, user_id: str, tweet_date: str) -> None:
-        add_date = datetime.now(self._tz).strftime('%Y-%m-%d %H:%M:%S')
+        add_date: str = datetime.now(self._tz).strftime('%Y-%m-%d %H:%M:%S')
         with self._connection.cursor() as cursor:
             cursor.execute(
                 'INSERT INTO uploaded_media_tweet (tweet_id, user_id, tweet_date, add_date)'
@@ -76,6 +76,7 @@ class Store:
                 'DELETE FROM failed_upload_media '
                 'WHERE url = %s',
                 (url,))
+
 
 if __name__ == '__main__':
     db = Store()

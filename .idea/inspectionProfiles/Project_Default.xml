@@ -11,5 +11,18 @@
         </value>
       </option>
     </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="tweepy.models.Status.is_quote_status" />
+          <option value="tweepy.models.Status.user" />
+          <option value="tweepy.models.Status.created_at" />
+          <option value="tweepy.models.Status.full_text" />
+          <option value="tweepy.models.Status.id_str" />
+          <option value="tweepy.models.Status.retweeted_" />
+          <option value="tweepy.models.Status.retweeted_status" />
+        </list>
+      </option>
+    </inspection_tool>
   </profile>
 </component>

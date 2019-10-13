@@ -3,18 +3,17 @@
 import os
 import googleapiclient.errors
 
-from typing import IO, Dict
+from typing import Dict, List
 from retry import retry
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from google_auth_httplib2 import AuthorizedHttp
-from google_auth_oauthlib.flow import InstalledAppFlow
 
 from app.env import Env
 
 API_SERVICE_NAME = 'photoslibrary'
 API_VERSION = 'v1'
-SCOPES = ['https://www.googleapis.com/auth/photoslibrary']
+SCOPES: List[str] = ['https://www.googleapis.com/auth/photoslibrary']
 UPLOAD_API_URL = 'https://photoslibrary.googleapis.com/v1/uploads'
 DUMMY_ACCESS_TOKEN = 'dummy_access_token'
 
@@ -30,41 +29,23 @@ class GooglePhotos:
         self.authorized_http = AuthorizedHttp(credentials=self.credentials)
 
     @staticmethod
-    def get_access_token() -> None:
-        client_id = Env.get_environment('GOOGLE_CLIENT_ID', required=True)
-        client_secret = Env.get_environment('GOOGLE_CLIENT_SECRET', required=True)
-        client_config = {
-            'installed': {
-                'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
-                'token_uri': 'https://accounts.google.com/o/oauth2/token',
-                'redirect_uris': ['urn:ietf:wg:oauth:2.0:oob'],
-                'client_id': client_id,
-                'client_secret': client_secret
-            }
-        }
-        flow = InstalledAppFlow.from_client_config(client_config, SCOPES)
-        credentials = flow.run_console()
-        print(f'refresh_token: {vars(credentials)["_refresh_token"]}')
-
-    @staticmethod
     def make_credentials() -> Credentials:
-        client_id = Env.get_environment('GOOGLE_CLIENT_ID', required=True)
-        client_secret = Env.get_environment('GOOGLE_CLIENT_SECRET', required=True)
-        refresh_token = Env.get_environment('GOOGLE_REFRESH_TOKEN', required=True)
+        client_id: str = Env.get_environment('GOOGLE_CLIENT_ID', required=True)
+        client_secret: str = Env.get_environment('GOOGLE_CLIENT_SECRET', required=True)
+        refresh_token: str = Env.get_environment('GOOGLE_REFRESH_TOKEN', required=True)
         return Credentials(
-            DUMMY_ACCESS_TOKEN,
-            refresh_token,
-            None,
-            'https://oauth2.googleapis.com/token',
-            client_id,
-            client_secret,
-            SCOPES
+            token=DUMMY_ACCESS_TOKEN,
+            refresh_token=refresh_token,
+            token_uri='https://oauth2.googleapis.com/token',
+            client_id=client_id,
+            client_secret=client_secret,
+            scopes=SCOPES
         )
 
     @retry(googleapiclient.errors.HttpError, tries=3, delay=2, backoff=2)
     def create_media_item(self, new_item: dict) -> Dict[str, str]:
-        response = self.service.mediaItems().batchCreate(body=new_item).execute()
-        status = response['newMediaItemResults'][0]['status']
+        response: dict = self.service.mediaItems().batchCreate(body=new_item).execute()
+        status: Dict[str, str] = response['newMediaItemResults'][0]['status']
         return status
 
     @retry((GoogleApiResponseNG, ConnectionError, TimeoutError), tries=3, delay=2, backoff=2)
@@ -84,7 +65,7 @@ class GooglePhotos:
         return upload_token.decode('utf-8')
 
     def upload_media(self, file_path: str, description: str) -> Dict[str, str]:
-        upload_token = self._execute_upload_api(file_path=file_path)
+        upload_token: str = self._execute_upload_api(file_path=file_path)
 
         new_item = {
             'newMediaItems': [{
