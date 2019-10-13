@@ -20,6 +20,12 @@ class TweetMedia(object):
     urls: List[str]
     tweet: tweepy.Status
 
+    def show_info(self) -> None:
+        tweet: tweepy.Status = self.tweet
+        urls: List[str] = self.urls
+        print(f'user_id={tweet.user.screen_name}, tweet_date={str(tweet.created_at)}, '
+              f'permalink={Twitter.make_tweet_permalink(tweet)}, media_urls={urls}')
+
 
 class Twitter:
     def __init__(self) -> None:
@@ -170,7 +176,7 @@ class Twitter:
     @classmethod
     def show_media_infos(cls, tweet_medias: Dict[str, TweetMedia]) -> None:
         for _, tweet_media in tweet_medias.items():
-            cls.show_media_info(tweet_media)
+            tweet_media.show_info()
 
     def show_tweet_media(self, tweet: tweepy.Status) -> None:
         print('################## ', self.make_tweet_permalink(tweet))

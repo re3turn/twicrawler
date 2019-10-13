@@ -87,7 +87,7 @@ class Crawler:
             target_tweet: tweepy.Status = target_tweet_media.tweet
             failed_upload_medias: List[Tuple[str, str]] = []
 
-            Twitter.show_media_info(target_tweet_media)
+            target_tweet_media.show_info()
             for url in target_tweet_media.urls:
                 description: str = Twitter.make_tweet_description(target_tweet)
                 is_saved: bool = self.save_media(url, description)
