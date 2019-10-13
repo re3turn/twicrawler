@@ -191,12 +191,10 @@ class Twitter:
                f'@{tweet.user.screen_name}\n' \
                f'{tweet.full_text}'
 
-    @classmethod
-    def show_media_info(cls, tweet_media: TweetMedia) -> None:
-        tweet: tweepy.Status = tweet_media.tweet
-        urls: List[str] = tweet_media.urls
-        print(f'user_id={tweet.user.screen_name}, tweet_date={str(tweet.created_at)}, '
-              f'permalink={cls.make_tweet_permalink(tweet)}, media_urls={urls}')
+    @staticmethod
+    def difference_tweet_medias(new: Dict[str, TweetMedia], old: Dict[str, TweetMedia]) -> Dict[str, TweetMedia]:
+        diff_keys = new.keys() - old.keys()
+        return {k: new[k] for k in diff_keys}
 
     @classmethod
     def show_media_infos(cls, tweet_medias: Dict[str, TweetMedia]) -> None:
@@ -290,9 +288,7 @@ class Twitter:
         target_tweet_medias: Dict[str, TweetMedia] = {}
         if 'fav' in self.mode:
             new_fav_result = self.get_favorite_media(user)
-            # valueにdict(unhashable)があるためitems()で差集合が計算できない。ので、keys()で計算する。
-            diff_keys = new_fav_result.keys() - self._last_fav_result.keys()
-            target_tweet_medias.update({k: new_fav_result[k] for k in diff_keys})
+            target_tweet_medias.update(self.difference_tweet_medias(new_fav_result, self._last_fav_result))
             self._last_fav_result = new_fav_result
         if 'rt' in self.mode or 'mixed' in self.mode:
             target_tweet_medias.update(self.get_rt_media(user))
