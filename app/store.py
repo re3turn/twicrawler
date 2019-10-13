@@ -1,14 +1,13 @@
 #!/usr/bin/python3
 
 import psycopg2
-import pytz
 import traceback
-from typing import Optional, Any
 
 from datetime import datetime
-from typing import Tuple, List
+from typing import Tuple, List, Optional, Any
 
 from app.env import Env
+from app.tz import Tz
 
 
 class Store:
@@ -16,14 +15,7 @@ class Store:
         self._db_url: str = Env.get_environment('DATABASE_URL', required=True)
         self._sslmode: str = Env.get_environment('DATABASE_SSLMODE', default='require', required=False)
         self._connection: Any = self._get_connection()
-        timezone: str = Env.get_environment('TZ')
-        if timezone == '':
-            self._tz = pytz.timezone(pytz.utc.zone)
-        else:
-            try:
-                self._tz = pytz.timezone(timezone)
-            except pytz.UnknownTimeZoneError:
-                self._tz = pytz.timezone(pytz.utc.zone)
+        self._tz = Tz.timezone()
 
     def _get_connection(self) -> Optional[psycopg2.extensions.connection]:
         try:
