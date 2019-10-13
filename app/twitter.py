@@ -62,7 +62,32 @@ class Twitter:
 
     @staticmethod
     def is_quoted(tweet: tweepy.Status) -> bool:
-        return tweet.is_quote_status
+        target_tweet = tweet
+        if hasattr(tweet, 'retweeted_status'):
+            target_tweet = tweet.retweeted_status
+        if not hasattr(target_tweet, 'quoted_status'):
+            return False
+        if not target_tweet.quoted_status:
+            return False
+        return True
+
+    @staticmethod
+    def is_favorited(tweet: tweepy.Status) -> bool:
+        target_tweet = tweet
+        if hasattr(tweet, 'retweeted_status'):
+            target_tweet = tweet.retweeted_status
+        if not hasattr(target_tweet, 'favorited'):
+            return False
+
+        return target_tweet.favorited
+
+    @staticmethod
+    def is_retweeted(tweet: tweepy.Status) -> object:
+        if not hasattr(tweet, 'retweeted_status'):
+            return False
+        if not tweet.retweeted_status:
+            return False
+        return True
 
     @staticmethod
     def _get_photo_url(media: dict) -> str:
@@ -134,7 +159,7 @@ class Twitter:
         if hasattr(tweet, 'retweeted_status'):
             target_tweet = tweet.retweeted_status
 
-        if self.is_quoted(target_tweet) and hasattr(target_tweet, 'quoted_status'):
+        if self.is_quoted(target_tweet):
             tweet_medias.update(self.get_tweet_medias(target_tweet.quoted_status))
 
         if hasattr(target_tweet, 'extended_entities') and 'media' in target_tweet.extended_entities:
@@ -244,15 +269,10 @@ class Twitter:
                 user.since_id = tweets.since_id
 
             for tweet in tweets:
-                if not hasattr(tweet, 'retweeted_status'):
+                if not self.is_retweeted(tweet):
                     continue
-                if not tweet.retweeted_status:
+                if 'mixed' in self.mode and (not self.is_favorited(tweet)):
                     continue
-                if 'mixed' in self.mode:
-                    if not hasattr(tweet.retweeted_status, 'favorited'):
-                        continue
-                    if not tweet.retweeted_status.favorited:
-                        continue
 
                 tweet_medias: Dict[str, TweetMedia] = {}
                 try:

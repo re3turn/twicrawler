@@ -19,6 +19,8 @@
           <option value="tweepy.models.Status.created_at" />
           <option value="tweepy.models.Status.full_text" />
           <option value="tweepy.models.Status.id_str" />
+          <option value="tweepy.models.Status.retweeted_" />
+          <option value="tweepy.models.Status.retweeted_status" />
         </list>
       </option>
     </inspection_tool>
