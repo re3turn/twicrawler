@@ -1,10 +1,14 @@
 #!/usr/bin/python3
 
-from bs4 import BeautifulSoup
+import logging
 import requests
 import json
 import re
+
+from bs4 import BeautifulSoup
 from typing import Any, List
+
+from app.log import Log
 
 
 class Instagram:
@@ -27,8 +31,10 @@ class Instagram:
         json_data = self._get_json_data()
 
         if 'entry_data' not in json_data:
+            logger.debug(f'Instagram: No entry_data.')
             return []
         if 'PostPage' not in json_data['entry_data']:
+            logger.debug(f'Instagram: No entry_data.')
             return []
 
         media_list = []
@@ -61,5 +67,9 @@ class Instagram:
 
 
 if __name__ == '__main__':
+    Log.init_logger(log_name='instagram')
+    logger: logging.Logger = logging.getLogger(__name__)
     insta = Instagram('https://www.instagram.com/p/B3IWnLkBD4M/')
     print(insta.get_media_urls())
+
+logger = logging.getLogger(__name__)

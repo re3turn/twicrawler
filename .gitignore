@@ -5,3 +5,4 @@ download/
 app/*.json
 .env
 .mypy_cache/
+*.log

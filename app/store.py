@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 
+import logging
 import psycopg2
-import traceback
 
 from datetime import datetime
 from typing import Tuple, List, Optional, Any
 
 from app.env import Env
+from app.log import Log
 from app.tz import Tz
 
 
@@ -17,18 +18,21 @@ class Store:
         self._connection: Any = self._get_connection()
         self._tz = Tz.timezone()
 
+        logger.debug(f'Store setting info. _db_url={self._db_url}, _sslmode={self._sslmode}')
+
     def _get_connection(self) -> Optional[psycopg2.extensions.connection]:
         try:
             connection = psycopg2.connect(self._db_url, sslmode=self._sslmode)
         except Exception as e:
-            print(e.args)
-            traceback.print_exc()
+            logger.exception(f'Connection error. exception={e.args}')
             return None
 
         connection.autocommit = True
         return connection
 
     def insert_tweet_info(self, tweet_id: str, user_id: str, tweet_date: str) -> None:
+        logger.debug(f'Insert tweet_id={tweet_id}, user_id={user_id}, and tweet_date={tweet_date} '
+                     f'into failed_upload_media table.')
         add_date: str = datetime.now(self._tz).strftime('%Y-%m-%d %H:%M:%S')
         with self._connection.cursor() as cursor:
             cursor.execute(
@@ -37,6 +41,8 @@ class Store:
                 (tweet_id, user_id, tweet_date, add_date))
 
     def insert_failed_upload_media(self, url: str, description: str, user_id: str) -> None:
+        logger.debug(f'Insert url={url}, description={description} and user_id={user_id} '
+                     f'into failed_upload_media table.')
         with self._connection.cursor() as cursor:
             cursor.execute(
                 'INSERT INTO failed_upload_media (url, description, user_id)'
@@ -44,6 +50,7 @@ class Store:
                 (url, description, user_id))
 
     def fetch_not_added_tweets(self, tweets: List[str]) -> List[str]:
+        logger.debug('Fetch not added tweets from uploaded_media_tweet table.')
         with self._connection.cursor() as cursor:
             cursor.execute(
                 'SELECT T2.tweet_id '
@@ -56,6 +63,7 @@ class Store:
             return cursor.fetchall()
 
     def fetch_all_failed_upload_medias(self) -> List[Tuple[str, str, str]]:
+        logger.debug('Fetch url and description from failed_upload_media table.')
         with self._connection.cursor() as cursor:
             cursor.execute(
                 'SELECT url, description, user_id '
@@ -63,6 +71,7 @@ class Store:
             return cursor.fetchall()
 
     def delete_failed_upload_media(self, url: str) -> None:
+        logger.debug(f'Delete row url={url} from failed_upload_media table.')
         with self._connection.cursor() as cursor:
             cursor.execute(
                 'DELETE FROM failed_upload_media '
@@ -71,4 +80,8 @@ class Store:
 
 
 if __name__ == '__main__':
+    Log.init_logger(log_name='store')
+    logger: logging.Logger = logging.getLogger(__name__)
     db = Store()
+
+logger = logging.getLogger(__name__)

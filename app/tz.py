@@ -1,3 +1,4 @@
+import logging
 import pytz
 
 from typing import Any
@@ -18,3 +19,6 @@ class Tz:
                 return pytz.timezone(tz_str)
             except pytz.UnknownTimeZoneError:
                 return pytz.timezone(pytz.utc.zone)
+
+
+logger: logging.Logger = logging.getLogger(__name__)
