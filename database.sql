@@ -13,5 +13,6 @@ create table failed_upload_media
     url         text not null
         constraint failed_upload_media_pk
             primary key,
-    description text not null
+    description text not null,
+    user_id     text not null
 );

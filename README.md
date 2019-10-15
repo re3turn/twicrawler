@@ -34,6 +34,7 @@ refresh_token: {REFRESH TOKEN}
 | MODE_SPECIFIED              | Specifies Crawler mode. `rt`, `fav`, `mixed`. default=`rt`                                                      |         |
 | TWEET_COUNT                 | Specifies the number of tweet statuses to retrieve. default=`200`                                               |         |
 | TWEET_PAGES                 | Specifies the page of results to retrieve. default=`25`                                                          |         |
+| SAVE_MODE                   | Specifies save media mode. `local` or `google`. default=`local`                                                 |         |
 | DATABASE_URL                | Database url. format `postgres://<username>:<password>@<hostname>:<port>/<database>`                            | ✓       |
 | DATABASE_SSLMODE            | [Database sslmode.](https://gist.github.com/pfigue/3440e2bc986550a6b8ec#valid-sslmode-values) default=`require` |         |
 | TZ                          | Time zone                                                                                                       |         |

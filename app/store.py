@@ -44,12 +44,12 @@ class Store:
                 'VALUES (%s, %s, %s, %s)',
                 (tweet_id, user_id, tweet_date, add_date))
 
-    def insert_failed_upload_media(self, url: str, description: str) -> None:
+    def insert_failed_upload_media(self, url: str, description: str, user_id: str) -> None:
         with self._connection.cursor() as cursor:
             cursor.execute(
-                'INSERT INTO failed_upload_media (url, description)'
-                'VALUES (%s, %s)',
-                (url, description))
+                'INSERT INTO failed_upload_media (url, description, user_id)'
+                'VALUES (%s, %s, %s)',
+                (url, description, user_id))
 
     def fetch_not_added_tweets(self, tweets: List[str]) -> List[str]:
         with self._connection.cursor() as cursor:
@@ -63,10 +63,10 @@ class Store:
                 (tweets,))
             return cursor.fetchall()
 
-    def fetch_all_failed_upload_medias(self) -> List[Tuple[str, str]]:
+    def fetch_all_failed_upload_medias(self) -> List[Tuple[str, str, str]]:
         with self._connection.cursor() as cursor:
             cursor.execute(
-                'SELECT url, description '
+                'SELECT url, description, user_id '
                 'FROM failed_upload_media')
             return cursor.fetchall()
 
