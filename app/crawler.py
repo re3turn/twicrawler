@@ -2,6 +2,7 @@
 
 import os
 import re
+import shutil
 import sys
 import time
 import traceback
@@ -21,15 +22,19 @@ from app.twitter import Twitter, TwitterUser, TweetMedia
 
 class Crawler:
     def __init__(self) -> None:
+        self._save_mode: str = Env.get_environment('SAVE_MODE', default='local')
         self.twitter: Twitter = Twitter()
         self.store: Store = Store()
-        self.google_photos: GooglePhotos = GooglePhotos()
+        if self._save_mode == 'google':
+            self.google_photos: GooglePhotos = GooglePhotos()
         self._download_dir: str = './download'
+
         os.makedirs(self._download_dir, exist_ok=True)
 
     @staticmethod
     @retry(urllib.error.HTTPError, tries=3, delay=2, backoff=2)
     def download_media(media_url: str, download_path: str) -> None:
+        os.makedirs(os.path.dirname(download_path), exist_ok=True)
         urllib.request.urlretrieve(media_url, download_path)
 
     def upload_google_photos(self, media_path: str, description: str) -> bool:
@@ -49,13 +54,13 @@ class Crawler:
 
         return True
 
-    def make_download_path(self, url: str) -> str:
+    def make_download_path(self, url: str, user_id: str) -> str:
         url = re.sub(r'\?.*$', '', url)
-        return f'{self._download_dir}/{os.path.basename(url)}'
+        return f'{self._download_dir}/{user_id}/{os.path.basename(url)}'
 
-    def save_media(self, url: str, description: str) -> bool:
+    def save_media(self, url: str, description: str, user_id: str) -> bool:
         # download
-        download_path: str = self.make_download_path(url)
+        download_path: str = self.make_download_path(url, user_id)
         if url.startswith('https://pbs.twimg.com/media') or url.startswith('http://pbs.twimg.com/media'):
             url = self.twitter.make_original_image_url(url)
         try:
@@ -65,11 +70,14 @@ class Crawler:
             print(f'download failed. media_url={url}', file=sys.stderr)
             return False
 
+        if self._save_mode == 'local':
+            return True
+
         # upload
         is_uploaded: bool = self.upload_google_photos(download_path, description)
 
         # delete
-        os.remove(download_path)
+        shutil.rmtree(os.path.dirname(download_path))
 
         if not is_uploaded:
             print(f'upload failed. media_url={url}', file=sys.stderr)
@@ -90,7 +98,7 @@ class Crawler:
             target_tweet_media.show_info()
             for url in target_tweet_media.urls:
                 description: str = Twitter.make_tweet_description(target_tweet)
-                is_saved: bool = self.save_media(url, description)
+                is_saved: bool = self.save_media(url, description, target_tweet.user.screen_name)
                 if not is_saved:
                     failed_upload_medias.append((url, description))
                     print(f'Save failed. tweet_id={tweet_id}, media_url={url}', file=sys.stderr)
@@ -109,7 +117,7 @@ class Crawler:
             # store failed upload media
             for failed_url, description in failed_upload_medias:
                 try:
-                    self.store.insert_failed_upload_media(failed_url, description)
+                    self.store.insert_failed_upload_media(failed_url, description, target_tweet.user.screen_name)
                 except Exception as e:
                     print(f'Insert failed. failed_url={failed_url}, description={description}',
                           e.args, file=sys.stderr)
@@ -118,8 +126,8 @@ class Crawler:
     def retry_backup_media(self) -> None:
         url: str = ''
         try:
-            for url, description in self.store.fetch_all_failed_upload_medias():
-                is_saved: bool = self.save_media(url, description)
+            for url, description, user_id in self.store.fetch_all_failed_upload_medias():
+                is_saved: bool = self.save_media(url, description, user_id)
                 if not is_saved:
                     print(f'Retry Save failed. media_url={url}', file=sys.stderr)
                     continue
