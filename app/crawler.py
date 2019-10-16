@@ -22,11 +22,13 @@ from app.twitter import Twitter, TwitterUser, TweetMedia
 
 class Crawler:
     def __init__(self) -> None:
+        self._save_mode: str = Env.get_environment('SAVE_MODE', default='local')
         self.twitter: Twitter = Twitter()
         self.store: Store = Store()
-        self.google_photos: GooglePhotos = GooglePhotos()
+        if self._save_mode == 'google':
+            self.google_photos: GooglePhotos = GooglePhotos()
         self._download_dir: str = './download'
-        self._save_mode: str = Env.get_environment('SAVE_MODE', default='local')
+
         os.makedirs(self._download_dir, exist_ok=True)
 
     @staticmethod
