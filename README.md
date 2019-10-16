@@ -27,6 +27,8 @@ refresh_token: {REFRESH TOKEN}
 
 # Environment variable 
 
+## Common
+
 | Environment variable        | Description                                                                                                     | Require |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------- | ------- |
 | TWITTER_USER_IDS            | Twitter user ID to crawling.If multiple users are specified, separate them with `,`                             | ✓       |
@@ -42,6 +44,11 @@ refresh_token: {REFRESH TOKEN}
 | TWITTER_CONSUMER_SECRET     | Twitter consumer API secret key                                                                                 | ✓       |
 | TWITTER_ACCESS_TOKEN        | Twitter Access token                                                                                            | ✓       |
 | TWITTER_ACCESS_TOKEN_SECRET | Twitter Access token secret                                                                                     | ✓       |
-| GOOGLE_CLIENT_ID            | Google API client id                                                                                            | ✓       |
-| GOOGLE_CLIENT_SECRET        | Google API client secret                                                                                        | ✓       |
-| GOOGLE_REFRESH_TOKEN        | Google API refresh token                                                                                        | ✓       |
+
+## SAVE_MODE = google
+
+| Environment variable        | Description              | Require |
+| --------------------------- | -------------------------| ------- |
+| GOOGLE_CLIENT_ID            | Google API client id     | ✓       |
+| GOOGLE_CLIENT_SECRET        | Google API client secret | ✓       |
+| GOOGLE_REFRESH_TOKEN        | Google API refresh token | ✓       |
