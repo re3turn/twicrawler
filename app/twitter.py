@@ -1,12 +1,15 @@
 #!/usr/bin/python3
 
 import dataclasses
+import logging
 import re
-import traceback
 import tweepy
+
 from typing import Iterator, List, Dict
+
 from app.env import Env
 from app.instagram import Instagram
+from app.log import Log
 
 
 @dataclasses.dataclass
@@ -23,8 +26,8 @@ class TweetMedia(object):
     def show_info(self) -> None:
         tweet: tweepy.Status = self.tweet
         urls: List[str] = self.urls
-        print(f'user_id={tweet.user.screen_name}, tweet_date={str(tweet.created_at)}, '
-              f'permalink={Twitter.make_tweet_permalink(tweet)}, media_urls={urls}')
+        logger.info(f'user_id={tweet.user.screen_name}, tweet_date={str(tweet.created_at)}, '
+                    f'permalink={Twitter.make_tweet_permalink(tweet)}, media_urls={urls}')
 
 
 class Twitter:
@@ -43,6 +46,9 @@ class Twitter:
         auth.set_access_token(access_token, access_token_secret)
         self.api = tweepy.API(auth, retry_count=3, retry_delay=5, retry_errors={500, 503}, wait_on_rate_limit=True,
                               wait_on_rate_limit_notify=True)
+
+        logger.debug(f'Twitter setting info. tweet_page={self.tweet_page}, tweet_count={self.tweet_count}, '
+                     f'mode={self.mode}')
 
     @staticmethod
     def make_original_image_url(url: str) -> str:
@@ -202,26 +208,29 @@ class Twitter:
             tweet_media.show_info()
 
     def show_tweet_media(self, tweet: tweepy.Status) -> None:
-        print('################## ', self.make_tweet_permalink(tweet))
+        logger.info('################## ', self.make_tweet_permalink(tweet))
         tweet_medias: Dict[str, TweetMedia] = {}
         try:
             tweet_medias = self.get_tweet_medias(tweet)
         except Exception as e:
-            print(e.args)
-            traceback.print_exc()
+            logger.exception(f'Get tweet media error. exception={e.args}')
+            return
         if tweet_medias:
             self.show_media_infos(tweet_medias)
         else:
-            print('no media')
+            logger.info('no media')
 
     def show_favorite_tweet_media(self, user: TwitterUser) -> None:
+        logger.info(f'Show favorite tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}')
         for tweets in self.limit_handled(tweepy.Cursor(self.api.favorites,
                                                        id=user.id,
+                                                       count=self.tweet_count,
                                                        tweet_mode='extended').pages(self.tweet_page)):
             for tweet in tweets:
                 self.show_tweet_media(tweet)
 
     def get_favorite_media(self, user: TwitterUser) -> Dict[str, TweetMedia]:
+        logger.info(f'Get favorite tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}')
         fav_twitter_medias: Dict[str, TweetMedia] = {}
         for tweets in self.limit_handled(tweepy.Cursor(self.api.favorites,
                                                        id=user.id,
@@ -232,8 +241,7 @@ class Twitter:
                 try:
                     tweet_medias = self.get_tweet_medias(tweet)
                 except Exception as e:
-                    print(e.args)
-                    traceback.print_exc()
+                    logger.exception(f'Get tweet media error. exception={e.args}')
 
                 if tweet_medias:
                     fav_twitter_medias.update(tweet_medias)
@@ -241,6 +249,8 @@ class Twitter:
         return fav_twitter_medias
 
     def show_rt_media(self, user: TwitterUser) -> None:
+        logger.info(f'Show RT tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}, '
+                    f'since_id={user.since_id}')
         for tweets in self.limit_handled(tweepy.Cursor(self.api.user_timeline,
                                                        id=user.id,
                                                        tweet_mode='extended',
@@ -257,6 +267,8 @@ class Twitter:
                 self.show_tweet_media(tweet)
 
     def get_rt_media(self, user: TwitterUser) -> Dict[str, TweetMedia]:
+        logger.info(f'Get RT tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}, '
+                    f'since_id={user.since_id}')
         rt_tweet_medias: Dict[str, TweetMedia] = {}
         for tweets in self.limit_handled(tweepy.Cursor(self.api.user_timeline,
                                                        id=user.id,
@@ -276,8 +288,8 @@ class Twitter:
                 try:
                     tweet_medias = self.get_tweet_medias(tweet)
                 except Exception as e:
-                    print(e.args)
-                    traceback.print_exc()
+                    logger.exception(f'Get tweet media error. exception={e.args}')
+                    continue
 
                 if tweet_medias:
                     rt_tweet_medias.update(tweet_medias)
@@ -296,6 +308,10 @@ class Twitter:
 
 
 if __name__ == '__main__':
+    Log.init_logger(log_name='twitter')
+    logger: logging.Logger = logging.getLogger(__name__)
     twitter_user = TwitterUser(id='TwitterJP')
     t = Twitter()
     t.show_rt_media(twitter_user)
+
+logger = logging.getLogger(__name__)

@@ -1,11 +1,10 @@
 #!/usr/bin/python3
 
+import logging
 import os
 import re
 import shutil
-import sys
 import time
-import traceback
 import urllib.request
 import urllib.error
 
@@ -16,6 +15,7 @@ from typing import List, Tuple, Dict
 
 from app.env import Env
 from app.google_photos import GooglePhotos
+from app.log import Log
 from app.store import Store
 from app.twitter import Twitter, TwitterUser, TweetMedia
 
@@ -35,6 +35,7 @@ class Crawler:
     @retry(urllib.error.HTTPError, tries=3, delay=2, backoff=2)
     def download_media(media_url: str, download_path: str) -> None:
         os.makedirs(os.path.dirname(download_path), exist_ok=True)
+        logger.debug(f'Download file. url={media_url}, path={download_path}')
         urllib.request.urlretrieve(media_url, download_path)
 
     def upload_google_photos(self, media_path: str, description: str) -> bool:
@@ -42,12 +43,10 @@ class Crawler:
             try:
                 self.google_photos.upload_media(media_path, description)
             except HttpError as error:
-                print(f'HTTP status={error.resp.reason}', file=sys.stderr)
-                traceback.print_exc()
+                logger.exception(f'HTTP status={error.resp.reason}')
                 return False
             except Exception as error:
-                print(f'Error reason={error}', file=sys.stderr)
-                traceback.print_exc()
+                logger.exception(f'Error reason={error}')
                 return False
 
             break
@@ -66,8 +65,7 @@ class Crawler:
         try:
             self.download_media(url, download_path)
         except urllib.error.HTTPError:
-            traceback.print_exc()
-            print(f'download failed. media_url={url}', file=sys.stderr)
+            logger.exception(f'Download failed. media_url={url}')
             return False
 
         if self._save_mode == 'local':
@@ -78,18 +76,25 @@ class Crawler:
 
         # delete
         shutil.rmtree(os.path.dirname(download_path))
+        logger.debug(f'Delete directory. path={os.path.dirname(download_path)}')
 
         if not is_uploaded:
-            print(f'upload failed. media_url={url}', file=sys.stderr)
+            logger.error(f'upload failed. media_url={url}')
             return False
 
         return True
 
     def backup_media(self, tweet_medias: Dict[str, TweetMedia]) -> None:
         if not tweet_medias:
+            logger.info('No new tweet media.')
             return
 
         target_tweet_ids = self.store.fetch_not_added_tweets(list(tweet_medias.keys()))
+        if not target_tweet_ids:
+            logger.info('No new tweet media.')
+            return
+        logger.info(f'Target tweet media count={len(target_tweet_ids)}')
+
         for tweet_id, in target_tweet_ids:
             target_tweet_media: TweetMedia = tweet_medias[tweet_id]
             target_tweet: tweepy.Status = target_tweet_media.tweet
@@ -101,17 +106,17 @@ class Crawler:
                 is_saved: bool = self.save_media(url, description, target_tweet.user.screen_name)
                 if not is_saved:
                     failed_upload_medias.append((url, description))
-                    print(f'Save failed. tweet_id={tweet_id}, media_url={url}', file=sys.stderr)
+                    logger.warning(f'Save failed. tweet_id={tweet_id}, media_url={url}')
                     continue
 
             # store update
             try:
                 self.store.insert_tweet_info(tweet_id, target_tweet.user.screen_name, str(target_tweet.created_at))
             except Exception as e:
-                print(f'Insert failed. tweet_id={tweet_id}', e.args, file=sys.stderr)
-                traceback.print_exc()
+                logger.exception(f'Insert failed. tweet_id={tweet_id}, exception={e.args}')
 
             if not failed_upload_medias:
+                logger.debug(f'All media upload succeeded. urls={target_tweet_media.urls}')
                 continue
 
             # store failed upload media
@@ -119,22 +124,21 @@ class Crawler:
                 try:
                     self.store.insert_failed_upload_media(failed_url, description, target_tweet.user.screen_name)
                 except Exception as e:
-                    print(f'Insert failed. failed_url={failed_url}, description={description}',
-                          e.args, file=sys.stderr)
-                    traceback.print_exc()
+                    logger.exception(f'Insert failed. failed_url={failed_url}, description={description},'
+                                     f'exception={e.args}')
 
     def retry_backup_media(self) -> None:
         url: str = ''
         try:
             for url, description, user_id in self.store.fetch_all_failed_upload_medias():
+                logger.info(f'Retry Save media. media_url={url}')
                 is_saved: bool = self.save_media(url, description, user_id)
                 if not is_saved:
-                    print(f'Retry Save failed. media_url={url}', file=sys.stderr)
+                    logger.warning(f'Retry Save failed. media_url={url}')
                     continue
                 self.store.delete_failed_upload_media(url)
         except Exception as e:
-            print(f'Retry backup failed. failed_url={url}', e.args, file=sys.stderr)
-            traceback.print_exc()
+            logger.exception(f'Retry backup failed. failed_url={url}, exception={e.args}')
 
     def crawling_tweets(self, user: TwitterUser) -> None:
         target_tweet_medias: Dict[str, TweetMedia] = self.twitter.get_target_tweets(user)
@@ -150,14 +154,19 @@ class Crawler:
         while True:
             try:
                 for user in user_list:
+                    logger.info(f'Crawling start. user = {user.id}, mode={self.twitter.mode}')
                     self.crawling_tweets(user)
             except Exception as e:
-                print(e.args)
-                traceback.print_exc()
+                logger.exception(f'Crawling error exception={e.args}')
 
+            logger.info(f'Interval. sleep {interval_minutes} minutes.')
             time.sleep(interval_minutes * 60)
 
 
 if __name__ == '__main__':
+    Log.init_logger(log_name='crawler')
+    logger: logging.Logger = logging.getLogger(__name__)
     crawler = Crawler()
     crawler.main()
+
+logger = logging.getLogger(__name__)

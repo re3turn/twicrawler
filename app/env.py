@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import logging
 import os
 import sys
 import termcolor
@@ -12,4 +13,8 @@ class Env:
         if required and (default == '') and (env is None):
             sys.exit(termcolor.colored(f'Error: Please set environment "{env_name}"', 'red'))
 
+        logger.debug(f'Get environment {env_name}={env}')
         return env
+
+
+logger: logging.Logger = logging.getLogger(__name__)
