@@ -1,4 +1,5 @@
 import logging
+import os
 
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
@@ -19,6 +20,8 @@ class Log:
         logger_level: str = Env.get_environment('LOGGER_LEVEL', default='INFO')
         if logger_level != 'INFO' and logger_level in cls.level_dict:
             level = cls.level_dict[logger_level]
+
+        os.makedirs('logs', exist_ok=True)
 
         cls.tz = Tz.timezone()
         logging.Formatter.converter = cls.time_converter
