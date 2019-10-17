@@ -1,0 +1,21 @@
+{
+    "newMediaItemResults": [
+        {
+            "uploadToken": "testASsyg4Pobmfre0SR0PFwrl9AN9LELBKoadu8U9at+MkxxHYmodhcjIQKu31lF32B1CsoahHwIroA2geFFiXb5bHanlfyKDeL1l3xiQSViADA7RFEdPFYqHBILQN7kiZiXrxd4cEWqFkk5AxzVXMaWPcOpQV9X0tn6vY5r4L1QhqwZs8QqpPqMAUWOmGWGTnb0Tau+4WMhkKBDGJ5yHnV0s4S/Fa58PM0lLu325dJQ76R0aIDgVxyyHaG7li8x2uTmPwZib30gF3S8is3kSbNu+3banyt8oDQc9uVERssw96AiYi+19UMwyZ1/4z/ud8aucTPx/pkRePf5zEpkDh/g3SC8WFgj5tLFcNhR/vOIBwAmK0Ip2ta0J8BHDPIWSyDi4RdGa5Hzvag7eeEb86LJhOT803Eu9iVLgUBAWtAQgwCC6eu3uU0UEgjB15B+zNLkhIYzO4FwSg7RawQ8hzijQothREIZxBZm4GY0mZ7TuU9RHOCnb+gycNEtMvbLxi9wcK9+OAbDMifA5uovrd5fhn9O/kL1aHePg2Og67X8d2L2q6bHzUynaA",
+            "status": {
+                "message": "OK"
+            },
+            "mediaItem": {
+                "id": "test9PFWScrzpnz-H1Sq3K_RKUrcizfoRlw5ZVosvU2iiwQ8KRXG81wJdYTampM9FgWgPnNr4R2gAW7J2INr02HhMfAwbw",
+                "description": "test",
+                "productUrl": "https://photos.google.com/lr/photo/test",
+                "mimeType": "video/mp4",
+                "mediaMetadata": {
+                    "creationTime": "2019-10-21T15:11:43Z",
+                    "width": "320",
+                    "height": "240"
+                }
+            }
+        }
+    ]
+}

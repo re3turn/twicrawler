@@ -12,4 +12,5 @@ psycopg2-binary>=2.8.4
 requests
 retry
 termcolor
+testfixtures
 tweepy>=3.8.0

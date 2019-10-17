@@ -1,0 +1,22 @@
+{
+    "newMediaItemResults": [
+        {
+            "uploadToken": "CAISqQMASsyg4Mwi259TtmasQK2qrk3q3Tjhhno1LqlqkyhIljeSw1XWKcR4gLBghKNh0jJG4LC17XaKqH/UHuBNuFlEqehN4Nk9qtS93OCnksegaPvm+y0Z95RtHdNfWOtsJFmlaP+P7JmysxC1H0zGf5oIHLPno70Avz/+DMD2xCHawmUY8CL5Ql/p2owp1kO2FfAv/PKeqcVWJcsjS5gD7Z4uyzz2hiOfptTc/zC1MIQ8FUZa6OcREDHirA2hgX7B36jK+x78kNLb0+fM98uSdr/nIl3m7inM1/jDkrhMiLXs1CRfqgwYjvTpw9iwe7kl2ZIH5+xpwxW9Mx5C7lZXxTBou4jloeoDtugfXrlPvdohxy5+ML0ohmRNa0pW8Q7rhnpT8Mj2HR/esn3V42SmgoZgQr1jcburgYiRHN/pE6qtgLK2PIqhDJaPYmJCFf70/1c6ITjbIMqRfQ7EaL427rxjpTbKsv5gF/BAH5GQAsDP5KzNsXXMhqQlJA79C5t8/Su0QBxfHP3wLaP3mklVf/m+7YCaGukKeZMO5qZ1EcR4KbwBFEOk87a9aw",
+            "status": {
+                "message": "Success"
+            },
+            "mediaItem": {
+                "id": "testBgjayX5PZu0PH3jFDDO4u4qq13gRfr-kTya3PQAXLnw5julp2WjrI__K7OTvLY1VqEsvWaApJq5bm3JxIsXVMxfIA",
+                "description": "test",
+                "productUrl": "https://photos.google.com/lr/photo/test",
+                "mimeType": "image/jpeg",
+                "mediaMetadata": {
+                    "creationTime": "2019-10-21T15:05:49Z",
+                    "width": "299",
+                    "height": "400"
+                },
+                "filename": "test.jpg"
+            }
+        }
+    ]
+}

@@ -1,0 +1,54 @@
+{
+    "albums": [
+        {
+            "id": "testgebilr0Y77q3DyrQRLeImd5dLGlOCS7PGY6chiDiJddC8mVJqdef_QzVcVz3prTKP8jt",
+            "title": "test1",
+            "productUrl": "https://photos.google.com/lr/album/test1",
+            "isWriteable": true,
+            "mediaItemsCount": "8",
+            "coverPhotoBaseUrl": "https://lh3.googleusercontent.com/lr/test1",
+            "coverPhotoMediaItemId": "testOd9HRMvEwO4FuICCd27X9CnItpeCvdYFiqSExm-V-lyudBdmXRiF49cWMjKz7CZOUq4z0xCwc5RiFQeGI6_vA_uzP5A"
+        },
+        {
+            "id": "testSN-34TUtz1Z40iboRJr3CQsYkhO7WhwC5-IrlByHeMzgIWpQiQD5VtmdJ8Dn6DtFnoS-",
+            "title": "test2",
+            "productUrl": "https://photos.google.com/lr/album/test2",
+            "mediaItemsCount": "63",
+            "coverPhotoBaseUrl": "https://lh3.googleusercontent.com/lr/test2",
+            "coverPhotoMediaItemId": "testdyigxDF9g7RM5XegUA6XglsB686LLL1rK96SJG454aD43SuALjS558oXhM01JQzfJQ31zL04nnSAxStZCKFg1fkLg"
+        },
+        {
+            "id": "testiJlhLSbCfuCy6ojbbdrSVukXmUpNbu1QH47mowk47k1zmavOJEafZDiwC6p-svQIO3eYN",
+            "title": "test3",
+            "productUrl": "https://photos.google.com/lr/album/test3",
+            "mediaItemsCount": "509",
+            "coverPhotoBaseUrl": "https://lh3.googleusercontent.com/lr/test3",
+            "coverPhotoMediaItemId": "testeAfK4Aickvq4eneqfwYvTAyP9ECQx8YDdtRptgn_Hjw3kd7zxDx3pBC97XMCIoD4cQdnykQOEwEp8QsonxVqpWF7rA"
+        },
+        {
+            "id": "testUEx5WaZX-9ytc0fcSAUYcZa0sYq5VPTE1LEqEeI3BNURLM-OTEMOxMabY6Ossev3N",
+            "title": "test4",
+            "productUrl": "https://photos.google.com/lr/album/test4",
+            "mediaItemsCount": "10",
+            "coverPhotoBaseUrl": "https://lh3.googleusercontent.com/lr/test4",
+            "coverPhotoMediaItemId": "testbsM3A6P88eTRrzqa2XXdkV3jKCUTmuZQ_2_xfzQyI1vTrNf7mZimmvOxTJNaBxseDTbBBi73hbiuFYa8Qa3Cyxz_1Lg"
+        },
+        {
+            "id": "test-0ITjPRlRvo3PtEmVA3BXnh2XwTvV2UmqV5mkpMUCiU23UR0piM8ZPqJCKC9NbkbB",
+            "title": "test5",
+            "productUrl": "https://photos.google.com/lr/album/test5",
+            "mediaItemsCount": "39",
+            "coverPhotoBaseUrl": "https://lh3.googleusercontent.com/lr/test5",
+            "coverPhotoMediaItemId": "testsqGjv4mAQedNA2YkkR4Zo5i6rwq37bvXZSps3qMorZls5CQLZM1cNejZozEe33pnt-CbL_sbvXMy5Pt-WWewl8pA"
+        },
+        {
+            "id": "testdM4vLK55Y6FmxvVcuNHx9D2pTn5yPjKTWLiwRYTnBXEuBfQguzjzohu01xfiSBiH7",
+            "title": "test6",
+            "productUrl": "https://photos.google.com/lr/album/test6",
+            "mediaItemsCount": "29",
+            "coverPhotoBaseUrl": "https://lh3.googleusercontent.com/lr/test6",
+            "coverPhotoMediaItemId": "testGsmd_2nTJcYStyP6uy_ylD9QVgtF9Ed_OlUKxhQWRM2869qm44EAIGUAyV8ia0dBw8o-T98OCIufMhCwiPOg"
+        }
+    ],
+    "nextPageToken": "test_next_page_token"
+}

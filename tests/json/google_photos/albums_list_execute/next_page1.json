@@ -1,0 +1,13 @@
+{
+    "albums": [
+        {
+            "id": "testgfdag77q3DyrQRLeImd5dLGlOCS7PGY6chiDiJddC8mVJqdef_QzVcVz3prTKP8jt",
+            "title": "exist_next_page",
+            "productUrl": "https://photos.google.com/lr/album/test7",
+            "isWriteable": true,
+            "mediaItemsCount": "8",
+            "coverPhotoBaseUrl": "https://lh3.googleusercontent.com/lr/test1",
+            "coverPhotoMediaItemId": "testtefeuICCd27X9CnItpeCvdYFiqSExm-V-lyudBdmXRiF49cWMjKz7CZOUq4z0xCwc5RiFQeGI6_vA_uzP5A"
+        }
+    ]
+}

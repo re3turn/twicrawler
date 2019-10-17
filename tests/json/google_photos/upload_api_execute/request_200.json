@@ -1,0 +1,9 @@
+{
+    "x-guploader-uploadid": "testXyR5Mcr8d4CIyN98mj9NmNlvuAD9Fa49QIUGV3hU7j9I5pagj0YthVJL3-13Kh-xZuB2p6LY5OCRNnil2HH4HVsv_crPEQv60iGZ2gl0-YPtE",
+    "content-type": "text/plain",
+    "content-length": "574",
+    "date": "Mon, 21 Oct 2019 15:05:48 GMT",
+    "server": "UploadServer",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000",
+    "status": "200"
+}
