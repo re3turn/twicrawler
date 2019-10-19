@@ -79,7 +79,7 @@ class GooglePhotos:
         logger.info(f'Upload media to Google Photos. path={file_path}')
         upload_token: str = self._execute_upload_api(file_path=file_path)
 
-        new_item: Dict[str, Any] = {
+        new_item: dict = {
             'newMediaItems': [{
                 'description': description,
                 'simpleMediaItem': {
@@ -98,7 +98,7 @@ class GooglePhotos:
         return self.create_media_item(new_item)
 
     def _get_album_id(self) -> str:
-        album_id = self._check_album_exist()
+        album_id: str = self._check_album_exist()
 
         if album_id == '':
             album_id = self._create_new_album()
@@ -108,7 +108,7 @@ class GooglePhotos:
     @retry((GoogleApiResponseNG, ConnectionError, TimeoutError), tries=3, delay=2, backoff=2)
     def _check_album_exist(self) -> str:
         logger.debug(f'Execute API to check if album exists in Google Photos. album_title={self._albume_title}')
-        parameters: Dict[str, Union[int, str, Dict[str, str]]] = {
+        parameters: Dict[str, Union[int, str]] = {
             'pageSize': 50,
             'pageToken': '',
             'excludeNonAppCreatedData': 'true'
@@ -137,7 +137,7 @@ class GooglePhotos:
     @retry((GoogleApiResponseNG, ConnectionError, TimeoutError), tries=3, delay=2, backoff=2)
     def _create_new_album(self) -> str:
         logger.debug(f'Execute API to create album to Google Photos. album_title={self._albume_title}')
-        parameters = {
+        parameters: Dict[str, Dict[str, str]] = {
             'album':{
                 'title': self._albume_title
             }
