@@ -48,8 +48,9 @@ refresh_token: {REFRESH TOKEN}
 
 ## SAVE_MODE = google
 
-| Environment variable        | Description              | Require |
-| --------------------------- | -------------------------| ------- |
-| GOOGLE_CLIENT_ID            | Google API client id     | ✓       |
-| GOOGLE_CLIENT_SECRET        | Google API client secret | ✓       |
-| GOOGLE_REFRESH_TOKEN        | Google API refresh token | ✓       |
+| Environment variable        | Description                                                            | Require |
+| --------------------------- | ---------------------------------------------------------------------- | ------- |
+| GOOGLE_CLIENT_ID            | Google API client id                                                   | ✓       |
+| GOOGLE_CLIENT_SECRET        | Google API client secret                                               | ✓       |
+| GOOGLE_REFRESH_TOKEN        | Google API refresh token                                               | ✓       |
+| GOOGLE_ALBUM_TITLE          | if specifies this, upload media add to specifies Album. default=`''`   |         |
