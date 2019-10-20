@@ -95,6 +95,9 @@ class Crawler:
             return
         logger.info(f'Target tweet media count={len(target_tweet_ids)}')
 
+        if self._save_mode == 'google':
+            self.google_photos.set_album_id()
+
         for tweet_id, in target_tweet_ids:
             target_tweet_media: TweetMedia = tweet_medias[tweet_id]
             target_tweet: tweepy.Status = target_tweet_media.tweet

@@ -33,8 +33,7 @@ class GooglePhotos:
         self.service = build(API_SERVICE_NAME, API_VERSION, credentials=self.credentials, cache_discovery=False)
         self.authorized_http = AuthorizedHttp(credentials=self.credentials)
         self._albume_title: str = Env.get_environment('GOOGLE_ALBUM_TITLE', default='')
-        if self._albume_title != '':
-            self._album_id: str = self._get_album_id()
+        self._album_id: str = ''
 
     @staticmethod
     def make_credentials() -> Credentials:
@@ -59,7 +58,7 @@ class GooglePhotos:
 
     @retry((GoogleApiResponseNG, ConnectionError, TimeoutError), tries=3, delay=2, backoff=2)
     def _execute_upload_api(self, file_path: str) -> str:
-        logger.debug(f'Execute API to upload media to Google Photos. path={file_path}')
+        logger.debug(f'Execute "POST:{UPLOAD_API_URL}" to upload media to Google Photos. path={file_path}')
         with open(file_path, 'rb') as file_data:
             headers = {
                 'Authorization': 'Bearer ' + self.credentials.token,
@@ -71,8 +70,9 @@ class GooglePhotos:
                                                                     headers=headers)
 
         if response.status != 200:
-            logger.debug(f'Google API response NG, status={response.status}, content={upload_token}')
-            raise GoogleApiResponseNG(f'Google API response NG, status={response.status}, content={upload_token}')
+            msg: str = f'"POST:{UPLOAD_API_URL}" response NG, status={response.status}, content={upload_token}'
+            logger.debug(msg)
+            raise GoogleApiResponseNG(msg)
         return upload_token.decode('utf-8')
 
     def upload_media(self, file_path: str, description: str) -> Dict[str, str]:
@@ -93,61 +93,61 @@ class GooglePhotos:
                 'albumId': self._album_id,
                 'albumPosition': {
                     'position': 'FIRST_IN_ALBUM',
-            }})
-
+                }})
         return self.create_media_item(new_item)
 
+    def set_album_id(self) -> None:
+        if self._albume_title != '':
+            self._album_id = self._get_album_id()
+
     def _get_album_id(self) -> str:
-        album_id: str = self._check_album_exist()
-
-        if album_id == '':
-            album_id = self._create_new_album()
-
-        return album_id
-    
-    @retry((GoogleApiResponseNG, ConnectionError, TimeoutError), tries=3, delay=2, backoff=2)
-    def _check_album_exist(self) -> str:
-        logger.debug(f'Execute API to check if album exists in Google Photos. album_title={self._albume_title}')
-        parameters: Dict[str, Union[int, str]] = {
-            'pageSize': 50,
-            'pageToken': '',
-            'excludeNonAppCreatedData': 'true'
-        }
+        album_id: str = ''
+        token: str = ''
 
         while True:
-            uri: str = ALBUMS_API_URL + '?' + parse.urlencode(parameters)
-            response, response_body = self.authorized_http.request(uri=uri, method='GET')
-            if response.status != 200:
-                logger.debug(f'Google API response NG, status={response.status}, content={response_body}')
-                raise GoogleApiResponseNG(f'Google API response NG, status={response.status}, content={response_body}')
-            api_result: dict = json.loads(response_body.decode('utf-8'))
-
+            api_result = self._execute_get_albums_api(token)
             if 'albums' in api_result:
                 for album in api_result['albums']:
                     if album['title'] == self._albume_title:
-                        return album['id']
-
+                        album_id = album['id']
+                        break
             if 'nextPageToken' in api_result:
-                parameters['pageToken'] = api_result['nextPageToken']
+                token = api_result['nextPageToken']
                 continue
             break
 
-        return ''
+        if album_id == '':
+            album_id = self._execute_create_new_album_api()
+
+        return album_id
 
     @retry((GoogleApiResponseNG, ConnectionError, TimeoutError), tries=3, delay=2, backoff=2)
-    def _create_new_album(self) -> str:
-        logger.debug(f'Execute API to create album to Google Photos. album_title={self._albume_title}')
-        parameters: Dict[str, Dict[str, str]] = {
-            'album':{
-                'title': self._albume_title
-            }
-        }
-        response, response_body = self.authorized_http.request(uri=ALBUMS_API_URL, method='POST', body=json.dumps(parameters))
+    def _execute_get_albums_api(self, token: str) -> dict:
+        logger.debug(f'Execute "GET:{ALBUMS_API_URL}" to check if album exists in Google Photos. \
+                    album_title={self._albume_title}')
+        uri: str = f'{ALBUMS_API_URL}?pageSize=50&pageToken={token}&excludeNonAppCreatedData=true'
+        response, response_body = self.authorized_http.request(uri=uri, method='GET')
         if response.status != 200:
-            logger.debug(f'Google API response NG, status={response.status}, content={response_body}')
-            raise GoogleApiResponseNG(f'Google API response NG, status={response.status}, content={response_body}')
+            msg: str = f'"GET:{ALBUMS_API_URL}" response NG, status={response.status}, content={response_body}'
+            logger.debug(msg)
+            raise GoogleApiResponseNG(msg)
+
+        return json.loads(response_body.decode('utf-8'))
+
+    @retry((GoogleApiResponseNG, ConnectionError, TimeoutError), tries=3, delay=2, backoff=2)
+    def _execute_create_new_album_api(self) -> str:
+        logger.debug(f'Execute "POST:{ALBUMS_API_URL}" to create album to Google Photos. \
+            album_title={self._albume_title}')
+        body_param: str = f'{{"album": {{"title": "{self._albume_title}"}}}}'
+        response, response_body = self.authorized_http.request(uri=ALBUMS_API_URL, method='POST', body=body_param)
+        if response.status != 200:
+            msg: str = f'"POST:{ALBUMS_API_URL}" response NG, status={response.status}, content={response_body}'
+            logger.debug(msg)
+            raise GoogleApiResponseNG(msg)
+
         created_album: dict = json.loads(response_body.decode('utf-8'))
         return created_album['id']
+
 
 if __name__ == '__main__':
     Log.init_logger(log_name='google_photos')
