@@ -6,7 +6,6 @@ import googleapiclient.errors
 import json
 
 from typing import Dict, List, Union, Any
-from urllib import parse
 from retry import retry
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -105,27 +104,27 @@ class GooglePhotos:
         token: str = ''
 
         while True:
-            api_result = self._execute_get_albums_api(token)
+            uri: str = f'{ALBUMS_API_URL}?pageSize=50&pageToken={token}&excludeNonAppCreatedData=true'
+            api_result: dict = self._execute_get_albums_api(uri)
             if 'albums' in api_result:
                 for album in api_result['albums']:
                     if album['title'] == self._albume_title:
-                        album_id = album['id']
-                        break
+                        return album['id']
             if 'nextPageToken' in api_result:
                 token = api_result['nextPageToken']
                 continue
             break
 
         if album_id == '':
+            logger.info(f'Create new album "{self._albume_title}" to Google Photos.')
             album_id = self._execute_create_new_album_api()
 
         return album_id
 
     @retry((GoogleApiResponseNG, ConnectionError, TimeoutError), tries=3, delay=2, backoff=2)
-    def _execute_get_albums_api(self, token: str) -> dict:
+    def _execute_get_albums_api(self, uri: str) -> dict:
         logger.debug(f'Execute "GET:{ALBUMS_API_URL}" to check if album exists in Google Photos. \
                     album_title={self._albume_title}')
-        uri: str = f'{ALBUMS_API_URL}?pageSize=50&pageToken={token}&excludeNonAppCreatedData=true'
         response, response_body = self.authorized_http.request(uri=uri, method='GET')
         if response.status != 200:
             msg: str = f'"GET:{ALBUMS_API_URL}" response NG, status={response.status}, content={response_body}'
@@ -138,8 +137,13 @@ class GooglePhotos:
     def _execute_create_new_album_api(self) -> str:
         logger.debug(f'Execute "POST:{ALBUMS_API_URL}" to create album to Google Photos. \
             album_title={self._albume_title}')
-        body_param: str = f'{{"album": {{"title": "{self._albume_title}"}}}}'
-        response, response_body = self.authorized_http.request(uri=ALBUMS_API_URL, method='POST', body=body_param)
+        params: Dict[str, Dict[str, str]] = {
+            'album': {
+                'title': self._albume_title
+            }
+        }
+        response, response_body = self.authorized_http.request(
+            uri=ALBUMS_API_URL, method='POST', body=json.dumps(params))
         if response.status != 200:
             msg: str = f'"POST:{ALBUMS_API_URL}" response NG, status={response.status}, content={response_body}'
             logger.debug(msg)
