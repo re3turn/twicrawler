@@ -97,19 +97,19 @@ class GooglePhotos:
         if self._albume_title == '':
             return
 
-        self._album_id = self._get_album_id()
+        self._album_id = self._fetch_album_id()
         if self._album_id == '':
             logger.info(f'Create new album "{self._albume_title}" to Google Photos.')
             self._execute_create_new_album_api()
 
-    def _get_album_id(self) -> str:
+    def _fetch_album_id(self) -> str:
         params: Dict[str, Union[int, str, bool]] = {
                 'pageSize': 50,
                 'pageToken': '',
                 'excludeNonAppCreatedData': True
             }
         while True:
-            api_result: dict = self._execute_get_albums_api(params)
+            api_result: dict = self._execute_fetch_albums_api(params)
             if 'albums' in api_result:
                 for album in api_result['albums']:
                     if album['title'] == self._albume_title:
@@ -121,8 +121,8 @@ class GooglePhotos:
 
         return ''
 
-    def _execute_get_albums_api(self, params: Dict[str, Union[int, str, bool]]) -> dict:
-        logger.debug(f'Execute "service.albums().list()" to get albums list in Google Photos.')
+    def _execute_fetch_albums_api(self, params: Dict[str, Union[int, str, bool]]) -> dict:
+        logger.debug(f'Execute "service.albums().list()" to fetch albums list in Google Photos.')
         return self.service.albums().list(**params).execute(num_retries=3)
 
     def _execute_create_new_album_api(self) -> None:
