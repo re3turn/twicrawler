@@ -4,7 +4,7 @@ import logging
 import os
 import googleapiclient.errors
 
-from typing import Dict, List
+from typing import Dict, List, Union
 from retry import retry
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -29,6 +29,8 @@ class GooglePhotos:
         self.credentials = self.make_credentials()
         self.service = build(API_SERVICE_NAME, API_VERSION, credentials=self.credentials, cache_discovery=False)
         self.authorized_http = AuthorizedHttp(credentials=self.credentials)
+        self._albume_title: str = Env.get_environment('GOOGLE_ALBUM_TITLE', default='')
+        self._album_id: str = ''
 
     @staticmethod
     def make_credentials() -> Credentials:
@@ -53,7 +55,7 @@ class GooglePhotos:
 
     @retry((GoogleApiResponseNG, ConnectionError, TimeoutError), tries=3, delay=2, backoff=2)
     def _execute_upload_api(self, file_path: str) -> str:
-        logger.debug(f'Execute API to upload media to Google Photos. path={file_path}')
+        logger.debug(f'Execute "POST:{UPLOAD_API_URL}" to upload media to Google Photos. path={file_path}')
         with open(file_path, 'rb') as file_data:
             headers = {
                 'Authorization': 'Bearer ' + self.credentials.token,
@@ -65,15 +67,16 @@ class GooglePhotos:
                                                                     headers=headers)
 
         if response.status != 200:
-            logger.debug(f'Google API response NG, status={response.status}, content={upload_token}')
-            raise GoogleApiResponseNG(f'Google API response NG, status={response.status}, content={upload_token}')
+            msg: str = f'"POST:{UPLOAD_API_URL}" response NG, status={response.status}, content={upload_token}'
+            logger.debug(msg)
+            raise GoogleApiResponseNG(msg)
         return upload_token.decode('utf-8')
 
     def upload_media(self, file_path: str, description: str) -> Dict[str, str]:
         logger.info(f'Upload media to Google Photos. path={file_path}')
         upload_token: str = self._execute_upload_api(file_path=file_path)
 
-        new_item = {
+        new_item: dict = {
             'newMediaItems': [{
                 'description': description,
                 'simpleMediaItem': {
@@ -82,7 +85,56 @@ class GooglePhotos:
             }]
         }
 
+        if self._albume_title != '':
+            new_item.update({
+                'albumId': self._album_id,
+                'albumPosition': {
+                    'position': 'FIRST_IN_ALBUM',
+                }})
         return self.create_media_item(new_item)
+
+    def init_album(self) -> None:
+        if self._albume_title == '':
+            return
+
+        self._album_id = self._fetch_album_id()
+        if self._album_id == '':
+            logger.info(f'Create new album "{self._albume_title}" to Google Photos.')
+            self._execute_create_new_album_api()
+
+    def _fetch_album_id(self) -> str:
+        params: Dict[str, Union[int, str, bool]] = {
+                'pageSize': 50,
+                'pageToken': '',
+                'excludeNonAppCreatedData': True
+            }
+        while True:
+            api_result: dict = self._execute_fetch_albums_api(params)
+            if 'albums' in api_result:
+                for album in api_result['albums']:
+                    if album['title'] == self._albume_title:
+                        return album['id']
+            if 'nextPageToken' in api_result:
+                params['pageToken'] = api_result['nextPageToken']
+                continue
+            break
+
+        return ''
+
+    def _execute_fetch_albums_api(self, params: Dict[str, Union[int, str, bool]]) -> dict:
+        logger.debug(f'Execute "service.albums().list()" to fetch albums list in Google Photos.')
+        return self.service.albums().list(**params).execute(num_retries=3)
+
+    def _execute_create_new_album_api(self) -> None:
+        logger.debug(f'Execute "service.albums().create()" to create new album to Google Photos. \
+            album_title={self._albume_title}')
+        params: Dict[str, Dict[str, str]] = {
+            'album': {
+                'title': self._albume_title
+            }
+        }
+        api_result: dict = self.service.albums().create(body=params).execute(num_retries=3)
+        self._album_id = api_result['id']
 
 
 if __name__ == '__main__':
