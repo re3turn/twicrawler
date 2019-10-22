@@ -134,7 +134,7 @@ class GooglePhotos:
                 'title': self._albume_title
             }
         }
-        api_result: dict =  self.service.albums().create(body=params).execute(num_retries=3)
+        api_result: dict = self.service.albums().create(body=params).execute(num_retries=3)
         self._album_id = api_result['id']
 
 
