@@ -4,7 +4,7 @@ import logging
 import os
 import googleapiclient.errors
 
-from typing import Dict, List, Union, Any
+from typing import Dict, List, Union
 from retry import retry
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -17,7 +17,6 @@ API_SERVICE_NAME = 'photoslibrary'
 API_VERSION = 'v1'
 SCOPES: List[str] = ['https://www.googleapis.com/auth/photoslibrary']
 UPLOAD_API_URL = 'https://photoslibrary.googleapis.com/v1/uploads'
-ALBUMS_API_URL = 'https://photoslibrary.googleapis.com/v1/albums'
 DUMMY_ACCESS_TOKEN = 'dummy_access_token'
 
 
