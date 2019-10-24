@@ -59,14 +59,6 @@ class Twitter:
         return url + '?name=orig'
 
     @staticmethod
-    def limit_handled(page: tweepy.cursor.IdIterator) -> Iterator[tweepy.models.ResultSet]:
-        while True:
-            try:
-                yield page.next()
-            except StopIteration:
-                break
-
-    @staticmethod
     def is_quoted(tweet: tweepy.Status) -> bool:
         target_tweet = tweet
         if hasattr(tweet, 'retweeted_status'):
@@ -222,20 +214,20 @@ class Twitter:
 
     def show_favorite_tweet_media(self, user: TwitterUser) -> None:
         logger.info(f'Show favorite tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}')
-        for tweets in self.limit_handled(tweepy.Cursor(self.api.favorites,
-                                                       id=user.id,
-                                                       count=self.tweet_count,
-                                                       tweet_mode='extended').pages(self.tweet_page)):
+        for tweets in tweepy.Cursor(self.api.favorites,
+                                    id=user.id,
+                                    count=self.tweet_count,
+                                    tweet_mode='extended').pages(self.tweet_page):
             for tweet in tweets:
                 self.show_tweet_media(tweet)
 
     def get_favorite_media(self, user: TwitterUser) -> Dict[str, TweetMedia]:
         logger.info(f'Get favorite tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}')
         fav_twitter_medias: Dict[str, TweetMedia] = {}
-        for tweets in self.limit_handled(tweepy.Cursor(self.api.favorites,
-                                                       id=user.id,
-                                                       count=self.tweet_count,
-                                                       tweet_mode="extended").pages(self.tweet_page)):
+        for tweets in tweepy.Cursor(self.api.favorites,
+                                    id=user.id,
+                                    count=self.tweet_count,
+                                    tweet_mode="extended").pages(self.tweet_page):
             for tweet in tweets:
                 tweet_medias: Dict[str, TweetMedia] = {}
                 try:
@@ -251,11 +243,11 @@ class Twitter:
     def show_rt_media(self, user: TwitterUser) -> None:
         logger.info(f'Show RT tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}, '
                     f'since_id={user.since_id}')
-        for tweets in self.limit_handled(tweepy.Cursor(self.api.user_timeline,
-                                                       id=user.id,
-                                                       tweet_mode='extended',
-                                                       count=self.tweet_count,
-                                                       since_id=user.since_id).pages(self.tweet_page)):
+        for tweets in tweepy.Cursor(self.api.user_timeline,
+                                    id=user.id,
+                                    tweet_mode='extended',
+                                    count=self.tweet_count,
+                                    since_id=user.since_id).pages(self.tweet_page):
             if user.since_id < tweets.since_id:
                 user.since_id = tweets.since_id
 
@@ -270,11 +262,11 @@ class Twitter:
         logger.info(f'Get RT tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}, '
                     f'since_id={user.since_id}')
         rt_tweet_medias: Dict[str, TweetMedia] = {}
-        for tweets in self.limit_handled(tweepy.Cursor(self.api.user_timeline,
-                                                       id=user.id,
-                                                       tweet_mode='extended',
-                                                       count=self.tweet_count,
-                                                       since_id=user.since_id).pages(self.tweet_page)):
+        for tweets in tweepy.Cursor(self.api.user_timeline,
+                                    id=user.id,
+                                    tweet_mode='extended',
+                                    count=self.tweet_count,
+                                    since_id=user.since_id).pages(self.tweet_page):
             if user.since_id < tweets.since_id:
                 user.since_id = tweets.since_id
 
