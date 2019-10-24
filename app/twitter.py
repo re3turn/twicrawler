@@ -200,7 +200,7 @@ class Twitter:
             tweet_media.show_info()
 
     def show_tweet_media(self, tweet: tweepy.Status) -> None:
-        logger.info('################## ', self.make_tweet_permalink(tweet))
+        logger.info(f'################## {self.make_tweet_permalink(tweet)}')
         tweet_medias: Dict[str, TweetMedia] = {}
         try:
             tweet_medias = self.get_tweet_medias(tweet)
