@@ -165,7 +165,7 @@ class Twitter:
         elif hasattr(target_tweet, 'entities') and self._has_instagram_url(target_tweet.entities):
             media_type = 'Instagram'
         else:
-            return {}
+            return tweet_medias
 
         if media_type == 'Twitter':
             extended_entities = target_tweet.extended_entities
@@ -173,9 +173,9 @@ class Twitter:
         elif media_type == 'Instagram':
             media_url_list = Instagram(self._get_instagram_url(target_tweet.entities)).get_media_urls()
         else:
-            return {}
+            return tweet_medias
 
-        tweet_medias = {target_tweet.id_str: TweetMedia(urls=media_url_list, tweet=target_tweet)}
+        tweet_medias[target_tweet.id_str] = TweetMedia(urls=media_url_list, tweet=target_tweet)
 
         return tweet_medias
 
