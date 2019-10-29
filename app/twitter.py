@@ -83,7 +83,7 @@ class Twitter:
         return target_tweet.favorited
 
     @staticmethod
-    def is_retweeted(tweet: tweepy.Status) -> object:
+    def is_retweeted(tweet: tweepy.Status) -> bool:
         if not hasattr(tweet, 'retweeted_status'):
             return False
         if not tweet.retweeted_status:
