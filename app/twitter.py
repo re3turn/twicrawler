@@ -42,10 +42,10 @@ class Twitter:
         access_token: str = Env.get_environment('TWITTER_ACCESS_TOKEN', required=True)
         access_token_secret: str = Env.get_environment('TWITTER_ACCESS_TOKEN_SECRET', required=True)
 
-        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        auth: tweepy.OAuthHandler = tweepy.OAuthHandler(consumer_key, consumer_secret)
         auth.set_access_token(access_token, access_token_secret)
-        self.api = tweepy.API(auth, retry_count=3, retry_delay=5, retry_errors={500, 503}, wait_on_rate_limit=True,
-                              wait_on_rate_limit_notify=True)
+        self.api: tweepy.API = tweepy.API(auth, retry_count=3, retry_delay=5, retry_errors={500, 503},
+                                          wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
         logger.debug(f'Twitter setting info. tweet_page={self.tweet_page}, tweet_count={self.tweet_count}, '
                      f'mode={self.mode}')
@@ -202,28 +202,6 @@ class Twitter:
         for _, tweet_media in tweet_medias.items():
             tweet_media.show_info()
 
-    def show_tweet_media(self, tweet: tweepy.Status) -> None:
-        logger.info(f'################## {self.make_tweet_permalink(tweet)}')
-        tweet_medias: Dict[str, TweetMedia] = {}
-        try:
-            tweet_medias = self.get_tweet_medias(tweet)
-        except Exception as e:
-            logger.exception(f'Get tweet media error. exception={e.args}')
-            return
-        if tweet_medias:
-            self.show_media_infos(tweet_medias)
-        else:
-            logger.info('no media')
-
-    def show_favorite_tweet_media(self, user: TwitterUser) -> None:
-        logger.info(f'Show favorite tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}')
-        for tweets in tweepy.Cursor(self.api.favorites,
-                                    id=user.id,
-                                    count=self.tweet_count,
-                                    tweet_mode='extended').pages(self.tweet_page):
-            for tweet in tweets:
-                self.show_tweet_media(tweet)
-
     def get_favorite_media(self, user: TwitterUser) -> Dict[str, TweetMedia]:
         logger.info(f'Get favorite tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}')
         fav_twitter_medias: Dict[str, TweetMedia] = {}
@@ -242,24 +220,6 @@ class Twitter:
                     fav_twitter_medias.update(tweet_medias)
 
         return fav_twitter_medias
-
-    def show_rt_media(self, user: TwitterUser) -> None:
-        logger.info(f'Show RT tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}, '
-                    f'since_id={user.since_id}')
-        for tweets in tweepy.Cursor(self.api.user_timeline,
-                                    id=user.id,
-                                    tweet_mode='extended',
-                                    count=self.tweet_count,
-                                    since_id=user.since_id).pages(self.tweet_page):
-            if user.since_id < tweets.since_id:
-                user.since_id = tweets.since_id
-
-            for tweet in tweets:
-                if not hasattr(tweet, 'retweeted_status'):
-                    continue
-                if not tweet.retweeted_status:
-                    continue
-                self.show_tweet_media(tweet)
 
     def get_rt_media(self, user: TwitterUser) -> Dict[str, TweetMedia]:
         logger.info(f'Get RT tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}, '
@@ -301,12 +261,58 @@ class Twitter:
             target_tweet_medias.update(self.get_rt_media(user))
         return target_tweet_medias
 
+    class Debug:
+        def __init__(self, twitter_obj: object) -> None:
+            self.twitter: Twitter = twitter_obj  # type: ignore
+            self.api: tweepy.API = self.twitter.api
+            self.tweet_page: int = self.twitter.tweet_page
+            self.tweet_count: int = self.twitter.tweet_count
+
+        def show_tweet_media(self, tweet: tweepy.Status) -> None:
+            logger.info(f'################## {self.twitter.make_tweet_permalink(tweet)}')
+            try:
+                tweet_medias: Dict[str, TweetMedia] = self.twitter.get_tweet_medias(tweet)
+            except Exception as e:
+                logger.exception(f'Get tweet media error. exception={e.args}')
+                return
+            if tweet_medias:
+                self.twitter.show_media_infos(tweet_medias)
+            else:
+                logger.info('no media')
+
+        def show_favorite_tweet_media(self, user: TwitterUser) -> None:
+            logger.info(f'Show favorite tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}')
+            for tweets in tweepy.Cursor(self.api.favorites,
+                                        id=user.id,
+                                        count=self.tweet_count,
+                                        tweet_mode='extended').pages(self.tweet_page):
+                for tweet in tweets:
+                    self.show_tweet_media(tweet)
+
+        def show_rt_media(self, user: TwitterUser) -> None:
+            logger.info(f'Show RT tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}, '
+                        f'since_id={user.since_id}')
+            for tweets in tweepy.Cursor(self.api.user_timeline,
+                                        id=user.id,
+                                        tweet_mode='extended',
+                                        count=self.tweet_count,
+                                        since_id=user.since_id).pages(self.tweet_page):
+                if user.since_id < tweets.since_id:
+                    user.since_id = tweets.since_id
+
+                for tweet in tweets:
+                    if not hasattr(tweet, 'retweeted_status'):
+                        continue
+                    if not tweet.retweeted_status:
+                        continue
+                    self.show_tweet_media(tweet)
+
 
 if __name__ == '__main__':
     Log.init_logger(log_name='twitter')
     logger: logging.Logger = logging.getLogger(__name__)
     twitter_user = TwitterUser(id='TwitterJP')
     t = Twitter()
-    t.show_rt_media(twitter_user)
+    Twitter.Debug(t).show_rt_media(twitter_user)
 
 logger = logging.getLogger(__name__)
