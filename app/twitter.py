@@ -53,8 +53,11 @@ class Twitter:
     @staticmethod
     def make_original_image_url(url: str) -> str:
         if '?' in url:
-            image_url = re.sub('name=[a-z0-9]+', 'name=orig', url)
-            return image_url
+            if 'name=' in url:
+                original_url: str = re.sub('name=[a-zA-Z0-9]+', 'name=orig', url)
+                return original_url
+            else:
+                return url + '&name=orig'
 
         return url + '?name=orig'
 
