@@ -32,17 +32,21 @@ class Store:
         connection.autocommit = True
         return connection
 
-    def _execute_query(self, query: str, variables: Optional[Tuple[Any, ...]] = None) -> psycopg2.extensions.cursor:
+    def _execute_query(self, query: str,
+                       variables: Optional[Tuple[Any, ...]] = None) -> Optional[List[Tuple[Any, ...]]]:
         for i in range(MAX_CONNECTION_RETRY + 1):
             try:
                 with self._connection.cursor() as cursor:
                     cursor.execute(query, variables)
-                    return cursor
+                    return cursor.fetchall()
             except psycopg2.InterfaceError as e:
                 if i == MAX_CONNECTION_RETRY:
                     raise e
                 logger.warning(f'Reconnection. exception={e.args}')
                 self._connection = self._get_connection()
+            except psycopg2.ProgrammingError:
+                #  Not produce any result set
+                return None
 
     def insert_tweet_info(self, tweet_id: str, user_id: str, tweet_date: str) -> None:
         logger.debug(f'Insert tweet_id={tweet_id}, user_id={user_id}, and tweet_date={tweet_date} '
@@ -61,7 +65,7 @@ class Store:
                 'VALUES (%s, %s, %s)',
                 (url, description, user_id))
 
-    def fetch_not_added_tweets(self, tweets: List[str]) -> List[str]:
+    def fetch_not_added_tweets(self, tweets: List[str]) -> List[Tuple[str]]:
         logger.debug('Fetch not added tweets from uploaded_media_tweet table.')
         query: str = 'SELECT T2.tweet_id ' \
                      'FROM uploaded_media_tweet T1 ' \
@@ -69,15 +73,13 @@ class Store:
                      '  (SELECT unnest(%s) as tweet_id) T2 ' \
                      'ON T1.tweet_id = T2.tweet_id ' \
                      'WHERE T1.tweet_id is null'
-        cursor: psycopg2.extensions.cursor = self._execute_query(query=query, variables=(tweets,))
-        return cursor.fetchall()
+        return self._execute_query(query=query, variables=(tweets,))
 
     def fetch_all_failed_upload_medias(self) -> List[Tuple[str, str, str]]:
         logger.debug('Fetch url and description from failed_upload_media table.')
         query: str = 'SELECT url, description, user_id ' \
                      'FROM failed_upload_media'
-        cursor: psycopg2.extensions.cursor = self._execute_query(query=query)
-        return cursor.fetchall()
+        return self._execute_query(query=query)
 
     def delete_failed_upload_media(self, url: str) -> None:
         logger.debug(f'Delete row url={url} from failed_upload_media table.')
