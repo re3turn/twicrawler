@@ -34,7 +34,7 @@ class Instagram:
             logger.debug(f'Instagram: No entry_data.')
             return []
         if 'PostPage' not in json_data['entry_data']:
-            logger.debug(f'Instagram: No entry_data.')
+            logger.debug(f'Instagram: No PostPage.')
             return []
 
         media_list = []
