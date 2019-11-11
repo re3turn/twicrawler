@@ -47,7 +47,7 @@ class GooglePhotos:
         )
 
     @retry(googleapiclient.errors.HttpError, tries=3, delay=2, backoff=2)
-    def create_media_item(self, new_item: dict) -> Dict[str, str]:
+    def _create_media_item(self, new_item: dict) -> Dict[str, str]:
         logger.debug('Create new item for Google Photos')
         response: dict = self.service.mediaItems().batchCreate(body=new_item).execute()
         status: Dict[str, str] = response['newMediaItemResults'][0]['status']
@@ -91,7 +91,7 @@ class GooglePhotos:
                 'albumPosition': {
                     'position': 'FIRST_IN_ALBUM',
                 }})
-        return self.create_media_item(new_item)
+        return self._create_media_item(new_item)
 
     def init_album(self) -> None:
         if self._albume_title == '':
@@ -100,7 +100,7 @@ class GooglePhotos:
         self._album_id = self._fetch_album_id()
         if self._album_id == '':
             logger.info(f'Create new album "{self._albume_title}" to Google Photos.')
-            self._execute_create_new_album_api()
+            self._create_new_album()
 
     def _fetch_album_id(self) -> str:
         params: Dict[str, Union[int, str, bool]] = {
@@ -109,7 +109,7 @@ class GooglePhotos:
                 'excludeNonAppCreatedData': True
             }
         while True:
-            api_result: dict = self._execute_fetch_albums_api(params)
+            api_result: dict = self._fetch_albums(params)
             if 'albums' in api_result:
                 for album in api_result['albums']:
                     if album['title'] == self._albume_title:
@@ -121,11 +121,11 @@ class GooglePhotos:
 
         return ''
 
-    def _execute_fetch_albums_api(self, params: Dict[str, Union[int, str, bool]]) -> dict:
+    def _fetch_albums(self, params: Dict[str, Union[int, str, bool]]) -> dict:
         logger.debug(f'Execute "service.albums().list()" to fetch albums list in Google Photos.')
         return self.service.albums().list(**params).execute(num_retries=3)
 
-    def _execute_create_new_album_api(self) -> None:
+    def _create_new_album(self) -> None:
         logger.debug(f'Execute "service.albums().create()" to create new album to Google Photos. \
             album_title={self._albume_title}')
         params: Dict[str, Dict[str, str]] = {
