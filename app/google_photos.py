@@ -83,7 +83,6 @@ class GooglePhotos:
 
         if response.status != 200:
             msg: str = f'"POST:{UPLOAD_API_URL}" response NG, status={response.status}, content={upload_token}'
-            logger.debug(msg)
             raise GoogleApiResponseNG(msg)
         return upload_token.decode('utf-8')
 
@@ -96,10 +95,8 @@ class GooglePhotos:
     def init_album(self) -> None:
         if self._album_title == '':
             return
-
         self._album_id = self._fetch_album_id()
         if self._album_id == '':
-            logger.info(f'Create new album "{self._albume_title}" to Google Photos.')
             self._create_new_album()
 
     def _fetch_album_id(self) -> str:
