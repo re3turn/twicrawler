@@ -29,7 +29,7 @@ class GooglePhotos:
         self.credentials = self.make_credentials()
         self.service = build(API_SERVICE_NAME, API_VERSION, credentials=self.credentials, cache_discovery=False)
         self.authorized_http = AuthorizedHttp(credentials=self.credentials)
-        self._albume_title: str = Env.get_environment('GOOGLE_ALBUM_TITLE', default='')
+        self._album_title: str = Env.get_environment('GOOGLE_ALBUM_TITLE', default='')
         self._album_id: str = ''
 
     @staticmethod
@@ -85,7 +85,7 @@ class GooglePhotos:
             }]
         }
 
-        if self._albume_title != '':
+        if self._album_title != '':
             new_item.update({
                 'albumId': self._album_id,
                 'albumPosition': {
@@ -94,7 +94,7 @@ class GooglePhotos:
         return self._create_media_item(new_item)
 
     def init_album(self) -> None:
-        if self._albume_title == '':
+        if self._album_title == '':
             return
 
         self._album_id = self._fetch_album_id()
@@ -112,7 +112,7 @@ class GooglePhotos:
             api_result: dict = self._fetch_albums(params)
             if 'albums' in api_result:
                 for album in api_result['albums']:
-                    if album['title'] == self._albume_title:
+                    if album['title'] == self._album_title:
                         return album['id']
             if 'nextPageToken' in api_result:
                 params['pageToken'] = api_result['nextPageToken']
@@ -130,7 +130,7 @@ class GooglePhotos:
             album_title={self._albume_title}')
         params: Dict[str, Dict[str, str]] = {
             'album': {
-                'title': self._albume_title
+                'title': self._album_title
             }
         }
         api_result: dict = self.service.albums().create(body=params).execute(num_retries=3)
