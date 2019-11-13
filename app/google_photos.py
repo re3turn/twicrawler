@@ -127,8 +127,8 @@ class GooglePhotos:
         return self.service.albums().list(**params).execute(num_retries=3)
 
     def _create_new_album(self) -> None:
-        logger.debug(f'Execute "service.albums().create()" to create new album to Google Photos. \
-            album_title={self._albume_title}')
+        logger.debug(f'Execute "service.albums().create()" to create new album to Google Photos. '
+                     f'album_title={self._album_title}')
         params: Dict[str, Dict[str, str]] = {
             'album': {
                 'title': self._album_title
