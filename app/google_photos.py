@@ -47,8 +47,23 @@ class GooglePhotos:
         )
 
     @retry(googleapiclient.errors.HttpError, tries=3, delay=2, backoff=2)
-    def _create_media_item(self, new_item: dict) -> Dict[str, str]:
+    def _create_media_item(self, upload_token: str, description: str) -> Dict[str, str]:
         logger.debug('Create new item for Google Photos')
+        new_item: dict = {
+            'newMediaItems': [{
+                'description': description,
+                'simpleMediaItem': {
+                    'uploadToken': upload_token
+                }
+            }]
+        }
+
+        if self._album_title != '':
+            new_item.update({
+                'albumId': self._album_id,
+                'albumPosition': {
+                    'position': 'FIRST_IN_ALBUM',
+                }})
         response: dict = self.service.mediaItems().batchCreate(body=new_item).execute()
         status: Dict[str, str] = response['newMediaItemResults'][0]['status']
         return status
@@ -76,22 +91,7 @@ class GooglePhotos:
         logger.info(f'Upload media to Google Photos. path={file_path}')
         upload_token: str = self._execute_upload_api(file_path=file_path)
 
-        new_item: dict = {
-            'newMediaItems': [{
-                'description': description,
-                'simpleMediaItem': {
-                    'uploadToken': upload_token
-                }
-            }]
-        }
-
-        if self._album_title != '':
-            new_item.update({
-                'albumId': self._album_id,
-                'albumPosition': {
-                    'position': 'FIRST_IN_ALBUM',
-                }})
-        return self._create_media_item(new_item)
+        return self._create_media_item(upload_token, description)
 
     def init_album(self) -> None:
         if self._album_title == '':
