@@ -103,26 +103,27 @@ class GooglePhotos:
             self._create_new_album()
 
     def _fetch_album_id(self) -> str:
-        params: Dict[str, Union[int, str, bool]] = {
-                'pageSize': 50,
-                'pageToken': '',
-                'excludeNonAppCreatedData': True
-            }
+        page_token = ''
         while True:
-            api_result: dict = self._fetch_albums(params)
+            api_result: dict = self._fetch_albums(page_token)
             if 'albums' in api_result:
                 for album in api_result['albums']:
                     if album['title'] == self._album_title:
                         return album['id']
             if 'nextPageToken' in api_result:
-                params['pageToken'] = api_result['nextPageToken']
+                page_token = api_result['nextPageToken']
                 continue
             break
 
         return ''
 
-    def _fetch_albums(self, params: Dict[str, Union[int, str, bool]]) -> dict:
+    def _fetch_albums(self, page_token: str) -> dict:
         logger.debug(f'Execute "service.albums().list()" to fetch albums list in Google Photos.')
+        params: Dict[str, Union[int, str, bool]] = {
+            'pageSize': 50,
+            'pageToken': page_token,
+            'excludeNonAppCreatedData': True
+        }
         return self.service.albums().list(**params).execute(num_retries=3)
 
     def _create_new_album(self) -> None:
