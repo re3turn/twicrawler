@@ -39,17 +39,14 @@ class Crawler:
         urllib.request.urlretrieve(media_url, download_path)
 
     def upload_google_photos(self, media_path: str, description: str) -> bool:
-        while True:
-            try:
-                self.google_photos.upload_media(media_path, description)
-            except HttpError as error:
-                logger.exception(f'HTTP status={error.resp.reason}')
-                return False
-            except Exception as error:
-                logger.exception(f'Error reason={error}')
-                return False
-
-            break
+        try:
+            self.google_photos.upload_media(media_path, description)
+        except HttpError as error:
+            logger.exception(f'HTTP status={error.resp.reason}')
+            return False
+        except Exception as error:
+            logger.exception(f'Error reason={error}')
+            return False
 
         return True
 
