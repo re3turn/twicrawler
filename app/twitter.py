@@ -10,6 +10,7 @@ from typing import Iterator, List, Dict
 from app.env import Env
 from app.instagram import Instagram
 from app.log import Log
+from app.util import has_attributes
 
 
 @dataclasses.dataclass
@@ -64,31 +65,23 @@ class Twitter:
     @staticmethod
     def is_quoted(tweet: tweepy.Status) -> bool:
         target_tweet = tweet
-        if hasattr(tweet, 'retweeted_status'):
+        if has_attributes(tweet, 'retweeted_status'):
             target_tweet = tweet.retweeted_status
-        if not hasattr(target_tweet, 'quoted_status'):
-            return False
-        if not target_tweet.quoted_status:
-            return False
-        return True
+        return has_attributes(target_tweet, 'quoted_status')
 
     @staticmethod
     def is_favorited(tweet: tweepy.Status) -> bool:
         target_tweet = tweet
-        if hasattr(tweet, 'retweeted_status'):
+        if has_attributes(tweet, 'retweeted_status'):
             target_tweet = tweet.retweeted_status
-        if not hasattr(target_tweet, 'favorited'):
+        if not has_attributes(target_tweet, 'favorited'):
             return False
 
         return target_tweet.favorited
 
     @staticmethod
     def is_retweeted(tweet: tweepy.Status) -> bool:
-        if not hasattr(tweet, 'retweeted_status'):
-            return False
-        if not tweet.retweeted_status:
-            return False
-        return True
+        return has_attributes(tweet, 'retweeted_status')
 
     @staticmethod
     def _get_photo_url(media: dict) -> str:
@@ -157,15 +150,15 @@ class Twitter:
         tweet_medias: Dict[str, TweetMedia] = {}
 
         target_tweet = tweet
-        if hasattr(tweet, 'retweeted_status'):
+        if has_attributes(tweet, 'retweeted_status'):
             target_tweet = tweet.retweeted_status
 
         if self.is_quoted(target_tweet):
             tweet_medias.update(self.get_tweet_medias(target_tweet.quoted_status))
 
-        if hasattr(target_tweet, 'extended_entities') and 'media' in target_tweet.extended_entities:
+        if has_attributes(target_tweet, 'extended_entities') and 'media' in target_tweet.extended_entities:
             media_type = 'Twitter'
-        elif hasattr(target_tweet, 'entities') and self._has_instagram_url(target_tweet.entities):
+        elif has_attributes(target_tweet, 'entities') and self._has_instagram_url(target_tweet.entities):
             media_type = 'Instagram'
         else:
             return tweet_medias
@@ -301,9 +294,7 @@ class Twitter:
                     user.since_id = tweets.since_id
 
                 for tweet in tweets:
-                    if not hasattr(tweet, 'retweeted_status'):
-                        continue
-                    if not tweet.retweeted_status:
+                    if not has_attributes(tweet, 'retweeted_status'):
                         continue
                     self.show_tweet_media(tweet)
 
