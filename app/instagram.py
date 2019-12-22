@@ -6,7 +6,7 @@ import json
 import re
 
 from bs4 import BeautifulSoup
-from typing import Any, List
+from typing import List
 
 from app.log import Log
 
@@ -15,8 +15,7 @@ class Instagram:
     def __init__(self, url: str) -> None:
         self.url = url
 
-    def _get_json_data(self) -> Any:
-
+    def _get_json_data(self) -> dict:
         res = requests.get(self.url)
         html = BeautifulSoup(res.content, 'html.parser')
 
@@ -66,10 +65,10 @@ class Instagram:
         return media_list
 
 
+logger: logging.Logger = logging.getLogger(__name__)
+
 if __name__ == '__main__':
     Log.init_logger(log_name='instagram')
-    logger: logging.Logger = logging.getLogger(__name__)
-    insta = Instagram('https://www.instagram.com/p/B3IWnLkBD4M/')
-    print(insta.get_media_urls())
-
-logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
+    instagram = Instagram('https://www.instagram.com/p/B3IWnLkBD4M/')
+    print(instagram.get_media_urls())

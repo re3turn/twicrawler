@@ -19,6 +19,7 @@ class Store:
 
         logger.debug(f'Store setting info. _db_url={self._db_url}, _sslmode={self._sslmode}')
 
+    # noinspection PyUnresolvedReferences
     def _get_connection(self) -> psycopg2.extensions.connection:
         try:
             connection = psycopg2.connect(self._db_url, sslmode=self._sslmode)
@@ -79,9 +80,9 @@ class Store:
                 cursor.execute(query=query, vars=(url,))
 
 
+logger: logging.Logger = logging.getLogger(__name__)
+
 if __name__ == '__main__':
     Log.init_logger(log_name='store')
-    logger: logging.Logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
     db = Store()
-
-logger = logging.getLogger(__name__)

@@ -15,6 +15,7 @@ class Tz:
         if tz_str == '':
             return pendulum.UTC
         else:
+            # noinspection PyUnresolvedReferences
             try:
                 return pendulum.timezone(tz_str)
             except pendulum.tz.zoneinfo.exceptions.InvalidTimezone:

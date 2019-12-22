@@ -169,10 +169,10 @@ class Crawler:
             time.sleep(interval_minutes * 60)
 
 
+logger: logging.Logger = logging.getLogger(__name__)
+
 if __name__ == '__main__':
     Log.init_logger(log_name='crawler')
-    logger: logging.Logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
     crawler = Crawler()
     crawler.main()
-
-logger = logging.getLogger(__name__)

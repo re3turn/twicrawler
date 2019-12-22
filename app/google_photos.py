@@ -134,10 +134,10 @@ class GooglePhotos:
         self._album_id = api_result['id']
 
 
+logger: logging.Logger = logging.getLogger(__name__)
+
 if __name__ == '__main__':
     Log.init_logger(log_name='google_photos')
-    logger: logging.Logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
     google_photo = GooglePhotos()
     print(google_photo.upload_media('test.jpg', 'test'))
-
-logger = logging.getLogger(__name__)
