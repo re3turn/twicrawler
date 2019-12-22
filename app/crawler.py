@@ -132,7 +132,7 @@ class Crawler:
                 self.store.insert_failed_upload_media(failed_url, description, target_tweet.user.screen_name)
             except Exception as e:
                 logger.exception(f'Insert failed. failed_url={failed_url}, description={description},'
-                                 f'exception={e.args}')
+                                 f' exception={e.args}')
 
     def retry_backup_media(self) -> None:
         url: str = ''
