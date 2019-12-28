@@ -197,11 +197,6 @@ class Twitter:
         diff_keys = new.keys() - old.keys()
         return {k: new[k] for k in diff_keys}
 
-    @classmethod
-    def show_media_infos(cls, tweet_medias: Dict[str, TweetMedia]) -> None:
-        for _, tweet_media in tweet_medias.items():
-            tweet_media.show_info()
-
     def get_favorite_media(self, user: TwitterUser) -> Dict[str, TweetMedia]:
         logger.info(f'Get favorite tweet media. user={user.id}. pages={self.tweet_page}, count={self.tweet_count}')
         fav_twitter_medias: Dict[str, TweetMedia] = {}
@@ -268,6 +263,11 @@ class Twitter:
             self.tweet_page: int = self.twitter.tweet_page
             self.tweet_count: int = self.twitter.tweet_count
 
+        @staticmethod
+        def show_media_infos(tweet_medias: Dict[str, TweetMedia]) -> None:
+            for _, tweet_media in tweet_medias.items():
+                tweet_media.show_info()
+
         def show_tweet_media(self, tweet: tweepy.Status) -> None:
             logger.info(f'################## {self.twitter.make_tweet_permalink(tweet)}')
             try:
@@ -276,7 +276,7 @@ class Twitter:
                 logger.exception(f'Get tweet media error. exception={e.args}')
                 return
             if tweet_medias:
-                self.twitter.show_media_infos(tweet_medias)
+                self.show_media_infos(tweet_medias)
             else:
                 logger.info('no media')
 
