@@ -110,9 +110,8 @@ class GooglePhotos:
             if 'nextPageToken' in api_result:
                 page_token = api_result['nextPageToken']
                 continue
-            break
 
-        return ''
+            return ''
 
     def _fetch_albums(self, page_token: str) -> dict:
         logger.debug(f'Execute "service.albums().list()" to fetch albums list in Google Photos.')
