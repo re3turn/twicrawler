@@ -10,8 +10,6 @@ from app.env import Env
 from app.log import Log
 from app.tz import Tz
 
-MAX_CONNECTION_RETRY = 3
-
 
 class Store:
     def __init__(self) -> None:
