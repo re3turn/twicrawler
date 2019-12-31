@@ -3,7 +3,7 @@ import os
 
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
-from typing import Any, Dict
+from typing import Any
 
 from app.env import Env
 from app.tz import Tz
@@ -12,14 +12,13 @@ from app.tz import Tz
 class Log:
     tz: Any
     format: str = '[%(asctime)s] %(module)s.%(funcName)s %(levelname)s: %(message)s'
-    level_dict: Dict[str, int] = {'CRITICAL': logging.CRITICAL, 'ERROR': logging.ERROR, 'WARNING': logging.WARNING,
-                                  'INFO': logging.INFO, 'DEBUG': logging.DEBUG, 'NOTSET': logging.NOTSET}
 
     @classmethod
-    def init_logger(cls,  log_name: str, level: int = logging.INFO) -> None:
+    def init_logger(cls, log_name: str) -> None:
+        level: int = logging.INFO
         logger_level: str = Env.get_environment('LOGGER_LEVEL', default='INFO')
-        if logger_level != 'INFO' and logger_level in cls.level_dict:
-            level = cls.level_dict[logger_level]
+        if type(logging.getLevelName(logger_level)) is int:
+            level = logging.getLevelName(logger_level)
 
         os.makedirs('logs', exist_ok=True)
 
