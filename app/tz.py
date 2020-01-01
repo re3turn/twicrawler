@@ -1,5 +1,5 @@
 import logging
-import pytz
+import pendulum
 
 from typing import Any
 
@@ -13,12 +13,12 @@ class Tz:
         if zone == '':
             tz_str = Env.get_environment('TZ')
         if tz_str == '':
-            return pytz.timezone(pytz.utc.zone)
+            return pendulum.UTC
         else:
             try:
-                return pytz.timezone(tz_str)
-            except pytz.UnknownTimeZoneError:
-                return pytz.timezone(pytz.utc.zone)
+                return pendulum.timezone(tz_str)
+            except pendulum.tz.zoneinfo.exceptions.InvalidTimezone:
+                return pendulum.UTC
 
 
 logger: logging.Logger = logging.getLogger(__name__)
