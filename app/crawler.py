@@ -109,7 +109,6 @@ class Crawler:
                     logger.warning(f'Save failed. tweet_id={tweet_id}, media_url={url}')
                     continue
 
-            # store update
             self.store_tweet_info(target_tweet)
 
             if not failed_upload_medias:
