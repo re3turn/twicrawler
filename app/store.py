@@ -48,7 +48,7 @@ class Store:
             with connection.cursor() as cursor:
                 cursor.execute(query=query, vars=(url, description, user_id))
 
-    def fetch_not_added_tweets(self, tweets: List[str]) -> List[Tuple[str]]:
+    def fetch_not_added_tweet_ids(self, tweet_ids: List[str]) -> List[Tuple[str]]:
         logger.debug('Fetch not added tweets from uploaded_media_tweet table.')
         query: str = 'SELECT T2.tweet_id ' \
                      'FROM uploaded_media_tweet T1 ' \
@@ -58,7 +58,7 @@ class Store:
                      'WHERE T1.tweet_id is null'
         with self._get_connection() as connection:
             with connection.cursor() as cursor:
-                cursor.execute(query=query, vars=(tweets,))
+                cursor.execute(query=query, vars=(tweet_ids,))
                 return cursor.fetchall()
 
     def fetch_all_failed_upload_medias(self) -> List[Tuple[str, str, str]]:
