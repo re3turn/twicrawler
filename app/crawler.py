@@ -39,17 +39,14 @@ class Crawler:
         urllib.request.urlretrieve(media_url, download_path)
 
     def upload_google_photos(self, media_path: str, description: str) -> bool:
-        while True:
-            try:
-                self.google_photos.upload_media(media_path, description)
-            except HttpError as error:
-                logger.exception(f'HTTP status={error.resp.reason}')
-                return False
-            except Exception as error:
-                logger.exception(f'Error reason={error}')
-                return False
-
-            break
+        try:
+            self.google_photos.upload_media(media_path, description)
+        except HttpError as error:
+            logger.exception(f'HTTP status={error.resp.reason}')
+            return False
+        except Exception as error:
+            logger.exception(f'Error reason={error}')
+            return False
 
         return True
 
@@ -112,23 +109,29 @@ class Crawler:
                     logger.warning(f'Save failed. tweet_id={tweet_id}, media_url={url}')
                     continue
 
-            # store update
-            try:
-                self.store.insert_tweet_info(tweet_id, target_tweet.user.screen_name, str(target_tweet.created_at))
-            except Exception as e:
-                logger.exception(f'Insert failed. tweet_id={tweet_id}, exception={e.args}')
+            self.store_tweet_info(target_tweet)
 
             if not failed_upload_medias:
                 logger.debug(f'All media upload succeeded. urls={target_tweet_media.urls}')
                 continue
 
-            # store failed upload media
-            for failed_url, description in failed_upload_medias:
-                try:
-                    self.store.insert_failed_upload_media(failed_url, description, target_tweet.user.screen_name)
-                except Exception as e:
-                    logger.exception(f'Insert failed. failed_url={failed_url}, description={description},'
-                                     f'exception={e.args}')
+            self.store_failed_upload_media(target_tweet, failed_upload_medias)
+
+    def store_tweet_info(self, target_tweet: tweepy.Status) -> None:
+        try:
+            self.store.insert_tweet_info(target_tweet.id_str, target_tweet.user.screen_name,
+                                         str(target_tweet.created_at))
+        except Exception as e:
+            logger.exception(f'Insert failed. tweet_id={target_tweet.id_str}, exception={e.args}')
+
+    def store_failed_upload_media(self, target_tweet: tweepy.Status,
+                                  failed_upload_medias: List[Tuple[str, str]]) -> None:
+        for failed_url, description in failed_upload_medias:
+            try:
+                self.store.insert_failed_upload_media(failed_url, description, target_tweet.user.screen_name)
+            except Exception as e:
+                logger.exception(f'Insert failed. failed_url={failed_url}, description={description},'
+                                 f' exception={e.args}')
 
     def retry_backup_media(self) -> None:
         url: str = ''
