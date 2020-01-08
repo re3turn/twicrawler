@@ -1,5 +1,5 @@
 def has_attributes(obj: object, name: str) -> bool:
     attr = getattr(obj, name, None)
-    if not attr:
+    if attr is None:
         return False
     return True
