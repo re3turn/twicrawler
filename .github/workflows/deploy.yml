@@ -22,12 +22,16 @@ jobs:
       with:
         path: ${{ github.event.repository.name }}
     - name: Generate ssh key
-      run: echo ${SSH_PRIVATE_KEY} > key && chmod 600 key
+      run: |
+        mkdir .ssh
+        chmod 700 .ssh
+        echo ${SSH_PRIVATE_KEY} > .ssh/id_rsa
+        chmod 600 .ssh/id_rsa
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
     - name: Generate .env file
       run: |
-        ls -l
+        ls -la
         ls -l ./${REPOGITORY_DIR}
         touch ./${REPOGITORY_DIR}/.env
         echo GOOGLE_ACCESS_TOKEN=${GOOGLE_ACCESS_TOKEN} >> ./${REPOGITORY_DIR}/.env
@@ -55,7 +59,7 @@ jobs:
         TWITTER_USER_IDS: ${{ secrets.TWITTER_USER_IDS }}
 
     - name: Deploy
-      run: rsync -rlptgoD --delete --exclude "${REPOGITORY_DIR}/.git/" -e "ssh -i ./key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${SSH_PORT}" ${REPOGITORY_DIR}/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+      run: rsync -rlptgoD --delete --exclude "${REPOGITORY_DIR}/.git/" -e "ssh -i ./.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${SSH_PORT}" ${REPOGITORY_DIR}/ ${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}
       env:
         SSH_USER: ${{ secrets.SSH_USER }}
         SSH_PORT: ${{ secrets.SSH_PORT }}
