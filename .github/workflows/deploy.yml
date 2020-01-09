@@ -9,7 +9,7 @@ on:
     - master
 
 env:
-  REPOGITORY_DIR: twicrawler
+  REPOGITORY_DIR: ${{ github.event.repository.name }}
 
 jobs:
   deploy:
@@ -20,7 +20,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        path: ${REPOGITORY_DIR}
+        path: ${{ github.event.repository.name }}
     - name: Generate ssh key
       run: echo ${SSH_PRIVATE_KEY} > key && chmod 600 key
       env:
@@ -28,6 +28,7 @@ jobs:
     - name: Generate .env file
       run: |
         ls -l
+        ls -l ./${REPOGITORY_DIR}
         touch ./${REPOGITORY_DIR}/.env
         echo GOOGLE_ACCESS_TOKEN=${GOOGLE_ACCESS_TOKEN} >> ./${REPOGITORY_DIR}/.env
         echo GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} >> ./${REPOGITORY_DIR}/.env
