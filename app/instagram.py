@@ -26,6 +26,7 @@ class Instagram:
 
         return json_user_data
 
+    # flake8: noqa: C901
     def get_media_urls(self) -> List[str]:
         json_data = self._get_json_data()
 
