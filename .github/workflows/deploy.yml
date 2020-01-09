@@ -1,0 +1,61 @@
+name: deploy to server
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+env:
+  REPOGITORY_DIR: twicrawler
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        path: ${REPOGITORY_DIR}
+    - name: Generate ssh key
+      run: echo ${SSH_PRIVATE_KEY} > key && chmod 600 key
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Generate .env file
+      run: |
+        touch ./${REPOGITORY_DIR}/.env
+        echo GOOGLE_ACCESS_TOKEN=${GOOGLE_ACCESS_TOKEN} >> ./${REPOGITORY_DIR}/.env
+        echo GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} >> ./${REPOGITORY_DIR}/.env
+        echo GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} >> ./${REPOGITORY_DIR}/.env
+        echo GOOGLE_PROJECT_ID=${GOOGLE_PROJECT_ID} >> ./${REPOGITORY_DIR}/.env
+        echo GOOGLE_REFRESH_TOKEN=${GOOGLE_REFRESH_TOKEN} >> ./${REPOGITORY_DIR}/.env
+        echo SAVE_MODE=${SAVE_MODE} >> ./${REPOGITORY_DIR}/.env
+        echo TWITTER_ACCESS_TOKEN=${TWITTER_ACCESS_TOKEN} >> ./${REPOGITORY_DIR}/.env
+        echo TWITTER_ACCESS_TOKEN_SECRET=${TWITTER_ACCESS_TOKEN_SECRET} >> ./${REPOGITORY_DIR}/.env
+        echo TWITTER_CONSUMER_KEY=${TWITTER_CONSUMER_KEY} >> ./${REPOGITORY_DIR}/.env
+        echo TWITTER_CONSUMER_SECRET=${TWITTER_CONSUMER_SECRET} >> ./${REPOGITORY_DIR}/.env
+        echo TWITTER_USER_IDS=${TWITTER_USER_IDS} >> ./${REPOGITORY_DIR}/.env
+      env:
+        GOOGLE_ACCESS_TOKEN: ${{ secrets.GOOGLE_ACCESS_TOKEN }}
+        GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+        GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
+        GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+        SAVE_MODE: ${{ secrets.SAVE_MODE }}
+        TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+        TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+        TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+        TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+        TWITTER_USER_IDS: ${{ secrets.TWITTER_USER_IDS }}
+
+    - name: Deploy
+      run: rsync -rlptgoD --delete --exclude "${REPOGITORY_DIR}/.git/" -e "ssh -i ./key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${SSH_PORT}" ${REPOGITORY_DIR}/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+      env:
+        SSH_USER: ${{ secrets.SSH_USER }}
+        SSH_PORT: ${{ secrets.SSH_PORT }}
+        DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
