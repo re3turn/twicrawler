@@ -1,4 +1,6 @@
 beautifulsoup4 >= 4.8.0
+dataclasses_json
+flake8
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
