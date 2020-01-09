@@ -27,6 +27,7 @@ jobs:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
     - name: Generate .env file
       run: |
+        
         touch ./${REPOGITORY_DIR}/.env
         echo GOOGLE_ACCESS_TOKEN=${GOOGLE_ACCESS_TOKEN} >> ./${REPOGITORY_DIR}/.env
         echo GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} >> ./${REPOGITORY_DIR}/.env
