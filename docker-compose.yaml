@@ -18,12 +18,12 @@ services:
       GOOGLE_CLIENT_SECRET:
       GOOGLE_REFRESH_TOKEN:
       TWITTER_USER_IDS:
-      INTERVAL: "5"
-      MODE_SPECIFIED: "rt"
-      TWEET_COUNT: "200"
-      TWEET_PAGES: "25"
-      SAVE_MODE: "local"
-      LOGGING_LEVEL: "INFO"
+      INTERVAL:
+      MODE_SPECIFIED:
+      TWEET_COUNT:
+      TWEET_PAGES:
+      SAVE_MODE:
+      LOGGING_LEVEL:
     depends_on:
       - postgres
   postgres:
