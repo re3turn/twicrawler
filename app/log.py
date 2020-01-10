@@ -16,7 +16,7 @@ class Log:
     @classmethod
     def init_logger(cls, log_name: str) -> None:
         level: int = logging.INFO
-        logger_level: str = Env.get_environment('LOGGER_LEVEL', default='INFO')
+        logger_level: str = Env.get_environment('LOGGING_LEVEL', default='INFO')
         if type(logging.getLevelName(logger_level)) is int:
             level = logging.getLevelName(logger_level)
 
