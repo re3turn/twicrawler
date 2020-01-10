@@ -5,8 +5,9 @@ on:
     branches:
       - master
     paths:
-      - 'tests/**'
       - '**.py'
+      - '!tests/**'
+      - '!get_refresh_token.py'
       - 'Dockerfile'
       - 'docker-compose.*'
       - 'requirements.txt'
@@ -14,8 +15,9 @@ on:
     branches:
       - master
     paths:
-      - 'tests/**'
       - '**.py'
+      - '!tests/**'
+      - '!get_refresh_token.py'
       - 'Dockerfile'
       - 'docker-compose.*'
       - 'requirements.txt'
