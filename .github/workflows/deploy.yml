@@ -1,4 +1,4 @@
-name: deploy to server
+name: Deploy to server
 
 on:
   push:
@@ -21,6 +21,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         path: ${{ github.event.repository.name }}
+
     - name: Generate ssh key
       run: |
         mkdir .ssh
@@ -29,10 +30,9 @@ jobs:
         chmod 600 .ssh/id_rsa
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
     - name: Generate .env file
       run: |
-        ls -la
-        ls -l ./${REPOGITORY_DIR}
         touch ./${REPOGITORY_DIR}/.env
         echo GOOGLE_ACCESS_TOKEN="${GOOGLE_ACCESS_TOKEN}" >> ./${REPOGITORY_DIR}/.env
         echo GOOGLE_CLIENT_ID="${GOOGLE_CLIENT_ID}" >> ./${REPOGITORY_DIR}/.env
@@ -59,9 +59,35 @@ jobs:
         TWITTER_USER_IDS: ${{ secrets.TWITTER_USER_IDS }}
 
     - name: Deploy
-      run: rsync -rlptgoD --delete --exclude "${REPOGITORY_DIR}/.git/" -e "ssh -i ./.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${SSH_PORT}" ${REPOGITORY_DIR}/ ${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}
+      run: |
+        rsync -rlptgoD --delete --exclude ".git/" --exclude ".github/" --exclude ".idea" \
+          -e "ssh -i ./.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${SSH_PORT}" \
+          ${REPOGITORY_DIR}/ ${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}
+        ssh -i ./.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} "cd ${DEPLOY_PATH}; docker-compose up -d"
       env:
         SSH_USER: ${{ secrets.SSH_USER }}
         SSH_PORT: ${{ secrets.SSH_PORT }}
         DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         SSH_HOST: ${{ secrets.SSH_HOST }}
+
+    - name: Slack Notification
+      if: always()
+      uses: rtCamp/action-slack-notify@master
+      env:
+        SLACK_CHANNEL: ${{secrets.SLACK_CHANNEL}}
+        SLACK_COLOR: '#008000'
+        SLACK_TITLE: ':rocket: Deploy complete! :rocket:'
+        SLACK_MESSAGE: 'Deploy complete :rocket:'
+        SLACK_USERNAME: GitHub Actions
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+  
+    - name: Slack Notification when build failed
+      if: failure()
+      uses: rtCamp/action-slack-notify@master
+      env:
+        SLACK_CHANNEL: ${{secrets.SLACK_CHANNEL}}
+        SLACK_COLOR: '#ff0000'
+        SLACK_TITLE: ':fire::fire::fire: Deploy error! :fire::fire::fire:'
+        SLACK_MESSAGE: "Deploy error! Please check github!"
+        SLACK_USERNAME: GitHub Actions
+        SLACK_WEBHOOK: ${{secrets.SLACK_WEBHOOK}}
