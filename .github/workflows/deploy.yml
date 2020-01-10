@@ -4,9 +4,21 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'tests/**'
+      - '**.py'
+      - 'Dockerfile'
+      - 'docker-compose.*'
+      - 'requirements.txt'
   pull_request:
     branches:
       - master
+    paths:
+      - 'tests/**'
+      - '**.py'
+      - 'Dockerfile'
+      - 'docker-compose.*'
+      - 'requirements.txt'
 
 env:
   REPOGITORY_DIR: ${{ github.event.repository.name }}
