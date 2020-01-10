@@ -71,13 +71,12 @@ jobs:
         SSH_HOST: ${{ secrets.SSH_HOST }}
 
     - name: Slack Notification
-      if: always()
       uses: rtCamp/action-slack-notify@master
       env:
         SLACK_CHANNEL: ${{secrets.SLACK_CHANNEL}}
         SLACK_COLOR: '#008000'
         SLACK_TITLE: ':rocket: Deploy complete! :rocket:'
-        SLACK_MESSAGE: 'Deploy complete :rocket:'
+        SLACK_MESSAGE: 'Deploy complete'
         SLACK_USERNAME: GitHub Actions
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
   
