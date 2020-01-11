@@ -86,7 +86,7 @@ class Crawler:
             logger.info('No new tweet media.')
             return
 
-        target_tweet_ids = self.store.fetch_not_added_tweets(list(tweet_medias.keys()))
+        target_tweet_ids = self.store.fetch_not_added_tweet_ids(list(tweet_medias.keys()))
         if not target_tweet_ids:
             logger.info('No new tweet media.')
             return
