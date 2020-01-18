@@ -25,11 +25,11 @@ class TestLog:
         mock_handler.reset_mock()
         mock_makedirs.reset_mock()
 
-        delete_env('LOGGER_LEVEL')
+        delete_env('LOGGING_LEVEL')
 
     @staticmethod
     def tearDown() -> None:
-        delete_env('LOGGER_LEVEL')
+        delete_env('LOGGING_LEVEL')
 
     @mock.patch('os.makedirs', mock_makedirs)
     @mock.patch('app.log.RotatingFileHandler', mock_handler)
@@ -58,7 +58,7 @@ class TestLog:
         ('UNKNOWN', logging.INFO),
     )
     def test_init_logger__env_level(self, logger_level: str, level: int) -> None:
-        os.environ['LOGGER_LEVEL'] = logger_level
+        os.environ['LOGGING_LEVEL'] = logger_level
         Log.init_logger(log_name=TEST_MODULE_NAME)
 
         (_, config_kwargs) = mock_basic_config.call_args
