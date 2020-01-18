@@ -5,7 +5,7 @@ import logging
 import re
 import tweepy
 
-from typing import Iterator, List, Dict
+from typing import List, Dict
 
 from app.env import Env
 from app.instagram import Instagram
@@ -227,7 +227,6 @@ class Twitter:
                 if 'mixed' in self.mode and (not self.is_favorited(tweet)):
                     continue
 
-                tweet_medias: Dict[str, TweetMedia] = {}
                 try:
                     tweet_medias = self.get_tweet_medias(tweet)
                 except Exception as e:
@@ -251,6 +250,7 @@ class Twitter:
 
     class Debug:
         def __init__(self, twitter_obj: object) -> None:
+            # noinspection PyTypeChecker
             self.twitter: Twitter = twitter_obj  # type: ignore
             self.api: tweepy.API = self.twitter.api
             self.tweet_page: int = self.twitter.tweet_page
@@ -299,11 +299,11 @@ class Twitter:
                     self.show_tweet_media(tweet)
 
 
+logger: logging.Logger = logging.getLogger(__name__)
+
 if __name__ == '__main__':
     Log.init_logger(log_name='twitter')
-    logger: logging.Logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
     twitter_user = TwitterUser(id='TwitterJP')
     t = Twitter()
     Twitter.Debug(t).show_rt_media(twitter_user)
-
-logger = logging.getLogger(__name__)

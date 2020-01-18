@@ -1,13 +1,15 @@
-beautifulsoup4 >= 4.8.0
+beautifulsoup4>=4.8.2
+dataclasses_json
+flake8
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
 google-oauth
 httplib2
-nose2 >= 0.9.1
+nose2>=0.9.1
 pendulum
-psycopg2-binary >= 2.8.3
+psycopg2-binary>=2.8.4
 requests
 retry
 termcolor
-tweepy >= 3.8.0
+tweepy>=3.8.0

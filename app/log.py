@@ -34,6 +34,7 @@ class Log:
             encoding='utf-8'
         )
 
+        # noinspection PyArgumentList
         logging.basicConfig(
             handlers=[stream_handler, file_handler],
             format=cls.format,
@@ -43,8 +44,7 @@ class Log:
         logging.getLogger('googleapiclient').setLevel(logging.WARNING)
         logging.getLogger('google_auth_httplib2').setLevel(logging.WARNING)
 
-
     @classmethod
     def time_converter(cls, *args: Any) -> Any:
+        _ = args
         return datetime.now(cls.tz).timetuple()
-
