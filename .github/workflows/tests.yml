@@ -1,6 +1,10 @@
-name: tests
+name: Tests
 
 on:
+  push:
+    paths:
+      - '**.py'
+      - 'requirements.txt'
   pull_request:
     paths:
       - '**.py'
