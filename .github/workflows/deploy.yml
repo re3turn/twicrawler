@@ -78,7 +78,6 @@ jobs:
       uses: rtCamp/action-slack-notify@master
       env:
         SLACK_CHANNEL: ${{secrets.SLACK_CHANNEL}}
-        SLACK_ICON: https://github.com/rtCamp.png?size=48
         SLACK_COLOR: '#008000'
         SLACK_TITLE: ':rocket: Deploy complete! :rocket:'
         SLACK_MESSAGE: 'Deploy complete'
@@ -90,7 +89,6 @@ jobs:
       uses: rtCamp/action-slack-notify@master
       env:
         SLACK_CHANNEL: ${{secrets.SLACK_CHANNEL}}
-        SLACK_ICON: https://github.com/rtCamp.png?size=48
         SLACK_COLOR: '#ff0000'
         SLACK_TITLE: ':fire::fire::fire: Deploy error! :fire::fire::fire:'
         SLACK_MESSAGE: "Deploy error! Please check github!"
