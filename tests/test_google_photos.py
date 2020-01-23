@@ -11,7 +11,7 @@ from testfixtures import LogCapture
 from typing import Any, Tuple, Dict, Union
 from unittest import mock
 
-from app.google_photos import GooglePhotos, GoogleApiResponseNG, UPLOAD_API_URL
+from app.google_photos import GooglePhotos, GoogleApiResponseNG
 from tests.lib.ulit import load_json, delete_env
 
 JSON_DIR = f'{os.path.dirname(__file__)}/json'
