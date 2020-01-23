@@ -7,7 +7,7 @@ on:
       - 'requirements.txt'
 
 jobs:
-  test:
+  tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,7 +29,6 @@ jobs:
       uses: rtCamp/action-slack-notify@master
       env:
         SLACK_CHANNEL: ${{secrets.SLACK_CHANNEL}}
-        SLACK_ICON: https://github.com/rtCamp.png?size=48
         SLACK_COLOR: '#ff0000'
         SLACK_TITLE: ' :x: Tests failed! :x:'
         SLACK_MESSAGE: "Tests failed! Please check github!"
@@ -56,14 +55,42 @@ jobs:
         # exit-zero treats all errors as warnings.
         flake8 . --count --max-complexity=10 --max-line-length=120 --statistics
 
-    - name: Slack Notification when tests failed
+    - name: Slack Notification when lint failed
       if: failure()
       uses: rtCamp/action-slack-notify@master
       env:
         SLACK_CHANNEL: ${{secrets.SLACK_CHANNEL}}
-        SLACK_ICON: https://github.com/rtCamp.png?size=48
         SLACK_COLOR: '#ff0000'
         SLACK_TITLE: ' :x: Lint error! :x:'
         SLACK_MESSAGE: "Lint error! Please check github!"
+        SLACK_USERNAME: GitHub Actions
+        SLACK_WEBHOOK: ${{secrets.SLACK_WEBHOOK}}
+  
+  type_checks:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install Mypy
+      run: |
+        python -m pip install --upgrade pip
+        pip install mypy
+    - name: Type checks with Mypy
+      run: |
+        mypy --version
+        mypy **/**.py
+
+    - name: Slack Notification when type checks failed
+      if: failure()
+      uses: rtCamp/action-slack-notify@master
+      env:
+        SLACK_CHANNEL: ${{secrets.SLACK_CHANNEL}}
+        SLACK_COLOR: '#ff0000'
+        SLACK_TITLE: ' :x: Type check error! :x:'
+        SLACK_MESSAGE: "Type check error! Please check github!"
         SLACK_USERNAME: GitHub Actions
         SLACK_WEBHOOK: ${{secrets.SLACK_WEBHOOK}}
