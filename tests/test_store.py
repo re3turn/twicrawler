@@ -6,7 +6,7 @@ from unittest import mock
 from testfixtures import LogCapture
 
 from app.store import Store
-from tests.lib.ulit import delete_env
+from tests.lib.utils import delete_env
 
 TEST_DATABASE_URL = 'postgres://username:password@hostname:port/database'
 TEST_SSLMODE_DEFAULT = 'require'

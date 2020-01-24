@@ -3,7 +3,7 @@ import os
 import termcolor
 
 from app.env import Env
-from tests.lib.ulit import delete_env
+from tests.lib.utils import delete_env
 
 ENV_VALUE = 'test1234'
 DEFAULT_VALUE = 'default_value'

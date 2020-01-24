@@ -15,7 +15,7 @@ from app.google_photos import GooglePhotos
 from app.store import Store
 from app.twitter import Twitter, TweetMedia, TwitterUser
 from tests.test_twitter import TwitterTestUtils
-from tests.lib.ulit import delete_env, load_json
+from tests.lib.utils import delete_env, load_json
 
 TEST_TWITTER_ID = 'TwicrawlerT'
 TEST_USER_ID = 'test_user_id'

@@ -7,7 +7,7 @@ from typing import List
 from unittest import mock
 
 from app.instagram import Instagram
-from tests.lib.ulit import load_json
+from tests.lib.utils import load_json
 
 JSON_DIR = f'{os.path.dirname(__file__)}/json'
 

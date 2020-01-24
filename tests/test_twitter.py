@@ -13,7 +13,7 @@ from app.instagram import Instagram
 from app.twitter import Twitter, TwitterUser, TweetMedia
 from app.util import has_attributes
 from tests.lib.logcapture_helper import LogCaptureHelper
-from tests.lib.ulit import load_json, delete_env
+from tests.lib.utils import load_json, delete_env
 
 TEST_TWITTER_ID: str = 'TwicrawlerT'
 JSON_DIR = f'{os.path.dirname(__file__)}/json'

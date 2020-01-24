@@ -5,7 +5,7 @@ import pendulum
 from typing import Optional, Any
 
 from app.tz import Tz
-from tests.lib.ulit import delete_env
+from tests.lib.utils import delete_env
 
 
 class TestTz:

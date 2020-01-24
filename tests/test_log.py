@@ -7,7 +7,7 @@ from unittest import mock
 
 from app.log import Log
 from app.tz import Tz
-from tests.lib.ulit import delete_env
+from tests.lib.utils import delete_env
 
 TEST_MODULE_NAME = 'TEST_MODULE'
 LOG_DIR = 'logs'
