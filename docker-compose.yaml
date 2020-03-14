@@ -26,6 +26,7 @@ services:
       LOGGING_LEVEL:
     depends_on:
       - postgres
+    restart: always
   postgres:
     image: postgres
     ports:
@@ -36,5 +37,6 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    restart: always
 volumes:
   postgres:
