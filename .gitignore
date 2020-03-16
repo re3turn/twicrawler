@@ -6,3 +6,5 @@ app/*.json
 .env
 .mypy_cache/
 *.log
+.coverage
+htmlcov/

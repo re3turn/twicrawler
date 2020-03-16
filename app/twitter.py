@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import dataclasses
+import dataclasses_json
 import logging
 import re
 import tweepy
@@ -19,6 +20,7 @@ class TwitterUser(object):
     since_id: int = 1
 
 
+@dataclasses_json.dataclass_json
 @dataclasses.dataclass
 class TweetMedia(object):
     urls: List[str]
@@ -148,7 +150,6 @@ class Twitter:
 
     def get_tweet_medias(self, tweet: tweepy.Status) -> Dict[str, TweetMedia]:
         tweet_medias: Dict[str, TweetMedia] = {}
-
         target_tweet = tweet
         if has_attributes(tweet, 'retweeted_status'):
             target_tweet = tweet.retweeted_status

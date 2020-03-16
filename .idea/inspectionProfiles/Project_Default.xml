@@ -11,6 +11,15 @@
         </value>
       </option>
     </inspection_tool>
+    <inspection_tool class="PyPep8NamingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredBaseClasses">
+        <list>
+          <option value="unittest.TestCase" />
+          <option value="unittest.case.TestCase" />
+          <option value="object" />
+        </list>
+      </option>
+    </inspection_tool>
     <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredIdentifiers">
         <list>
@@ -19,8 +28,14 @@
           <option value="tweepy.models.Status.created_at" />
           <option value="tweepy.models.Status.full_text" />
           <option value="tweepy.models.Status.id_str" />
-          <option value="tweepy.models.Status.retweeted_" />
+          <option value="tweepy.models.Status.retweeted" />
           <option value="tweepy.models.Status.retweeted_status" />
+          <option value="tweepy.models.Status._json" />
+          <option value="app.google_photos.GooglePhotos._create_media_item" />
+          <option value="app.google_photos.GooglePhotos._fetch_albums" />
+          <option value="app.google_photos.GooglePhotos._create_new_album" />
+          <option value="tweepy.models.Status.extended_entities" />
+          <option value="tweepy.models.Status.entities" />
         </list>
       </option>
     </inspection_tool>
