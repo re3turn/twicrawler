@@ -21,7 +21,7 @@ class Instagram:
 
         pattern = re.compile('window._sharedData = ({.*?});')
         script = html.find('script', text=pattern)
-        data = pattern.search(script.text).group(1)  # type: ignore
+        data = pattern.search(script.string).group(1)  # type: ignore
         json_user_data = json.loads(data)
 
         return json_user_data
