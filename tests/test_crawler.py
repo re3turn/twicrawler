@@ -1,21 +1,21 @@
-import httplib2
 import logging
-import nose2.tools
 import os
-import tweepy
 import urllib.error
-
-from googleapiclient.errors import HttpError
-from testfixtures import LogCapture
 from typing import Dict, Tuple, List, Optional
 from unittest import mock
+
+import httplib2
+import nose2.tools
+import tweepy
+from googleapiclient.errors import HttpError
+from testfixtures import LogCapture
 
 from app.crawler import Crawler
 from app.google_photos import GooglePhotos
 from app.store import Store
 from app.twitter import Twitter, TweetMedia, TwitterUser
-from tests.test_twitter import TwitterTestUtils
 from tests.lib.utils import delete_env, load_json
+from tests.test_twitter import TwitterTestUtils
 
 TEST_TWITTER_ID = 'TwicrawlerT'
 TEST_USER_ID = 'test_user_id'
@@ -201,8 +201,8 @@ class TestCrawler:
 
     @mock.patch('time.sleep', mock_sleep)  # for retry
     def test_save_media__download_failed(self) -> None:
-        mock_request.urlretrieve.side_effect = urllib.error.HTTPError(TEST_MEDIA_URL, code='500', msg='', hdrs='',
-                                                                      fp=None)
+        mock_request.urlretrieve.side_effect = urllib.error.HTTPError(TEST_MEDIA_URL, code=500, msg='', hdrs={},
+                                                                      fp=None)  # type: ignore
 
         with LogCapture(level=logging.ERROR) as log:
             is_save = self.crawler.save_media(TEST_MEDIA_URL, TEST_DESCRIPTION, TEST_USER_ID)
