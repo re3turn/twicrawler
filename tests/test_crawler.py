@@ -215,7 +215,7 @@ class TestCrawler:
 
         with LogCapture(level=logging.ERROR) as log:
             is_save = self.crawler.save_media(TEST_MEDIA_URL, TEST_DESCRIPTION, TEST_USER_ID)
-            log.check(('app.crawler', 'ERROR', f'Error reason='),
+            log.check(('app.crawler', 'ERROR', 'Error reason='),
                       ('app.crawler', 'ERROR', f'upload failed. media_url={TEST_MEDIA_URL}'))
         assert is_save is False
 
