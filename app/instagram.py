@@ -14,9 +14,12 @@ from app.log import Log
 class Instagram:
     def __init__(self, url: str) -> None:
         self.url = url
+        self.headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6)'
+                                      'AppleWebKit/537.36 (KHTML, like Gecko)'
+                                      'Chrome/85.0.4183.102'}
 
     def _get_json_data(self) -> dict:
-        res = requests.get(self.url)
+        res = requests.get(self.url, headers=self.headers)
         html = BeautifulSoup(res.content, 'html.parser')
 
         pattern = re.compile('window._sharedData = ({.*?});')
