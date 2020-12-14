@@ -114,7 +114,7 @@ class GooglePhotos:
             return ''
 
     def _fetch_albums(self, page_token: str) -> dict:
-        logger.debug(f'Execute "service.albums().list()" to fetch albums list in Google Photos.')
+        logger.debug('Execute "service.albums().list()" to fetch albums list in Google Photos.')
         params: Dict[str, Union[int, str, bool]] = {
             'pageSize': 50,
             'pageToken': page_token,
