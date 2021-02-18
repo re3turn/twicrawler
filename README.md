@@ -15,13 +15,13 @@ cd twicrawler
 
 ## Setup
 
-Setting [environment variable](#Environment variable) in the `.env` file.
+Setting [environment variable](#environment-variable) in the `.env` file.
 
 If you need examples, check the sample `.env.sample` in this repository.
 
 ### Get Google refresh token
 
-Setting [environment variable](#Environment variable) `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to `.env` file.
+Setting [environment variable](#environment-variable) `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to `.env` file.
 
 ```
 docker-compose build app
