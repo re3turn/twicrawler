@@ -17,7 +17,7 @@ cd twicrawler
 
 Setting [environment variable](#environment-variable) in the `.env` file.
 
-If you need examples, check the sample `.env.sample` in this repository.
+If you need examples, check the sample [`.env.sample`](.env.sample) in this repository.
 
 ### Get Google refresh token
 
