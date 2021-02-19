@@ -8,7 +8,8 @@ RUN apk add --no-cache --virtual build-deps build-base libffi-dev \
   && pip install --no-cache-dir -r requirements.txt \
   && apk del build-deps
 
-COPY app .
+COPY app ./app
 COPY run.py .
+COPY get_refresh_token.py .
 
 CMD ["python", "./run.py"]

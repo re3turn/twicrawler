@@ -1,28 +1,46 @@
 # Installation
 
 ## Requirement
- - python3.7.*
- - PostgreSQL
- - Twitter APIs
- - Google APIs
+- Docker version 18.06.0+
+- docker-compose version 1.22.0+
+- Twitter APIs
+- Google APIs
 
 ## Install
 
 ```:bash
 git clone https://github.com/re3turn/twicrawler.git
 cd twicrawler
-pip3 install -r requirements.txt
 ```
 
-## Get Google refresh token
+## Setup
 
-Execute `get_refresh_token.py` after setting environment variables `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
+Setting [environment variable](#environment-variable) in the `.env` file.
+
+If you need examples, check the sample [`.env.sample`](.env.sample) in this repository.
+
+### Get Google refresh token
+
+Setting [environment variable](#environment-variable) `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to `.env` file.
+
+```
+docker-compose build app
+docker run -i --env-file=.env twicrawler python get_refresh_token.py
+```
+
+#### Execution example
 
 ```:bash
-$ python3 get_refresh_token.py
+$ docker run -i --env-file=.env twicrawler python get_refresh_token.py
 Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth?response_type=code&.....
 Enter the authorization code: {AUTHORIZATION CODE}
 refresh_token: {REFRESH TOKEN}
+```
+
+## Run
+
+```:bash
+docker-compose up -d
 ```
 
 # Environment variable 
