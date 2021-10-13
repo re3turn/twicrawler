@@ -82,7 +82,7 @@ jobs:
     - name: Type checks with Mypy
       run: |
         mypy --version
-        mypy **/**.py
+        mypy --install-types --non-interactive **/**.py
 
     - name: Slack Notification when type checks failed
       if: failure()
