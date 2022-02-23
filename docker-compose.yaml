@@ -26,6 +26,10 @@ services:
       LOGGING_LEVEL:
     depends_on:
       - postgres
+    logging:
+      options:
+        max-file: '3'
+        max-size: 10m
     restart: always
   postgres:
     image: postgres:13
@@ -37,6 +41,11 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    logging:
+      options:
+        max-file: '3'
+        max-size: 10m
     restart: always
+
 volumes:
   postgres:
