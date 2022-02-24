@@ -24,6 +24,7 @@ services:
       TWEET_PAGES:
       SAVE_MODE:
       LOGGING_LEVEL:
+      OUTPUT_LOG_FILE_ENABLED: "false"
     depends_on:
       - postgres
     logging:

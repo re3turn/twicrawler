@@ -3,7 +3,7 @@ import os
 
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
-from typing import Any
+from typing import Any, List
 
 from app.env import Env
 from app.tz import Tz
@@ -20,23 +20,25 @@ class Log:
         if type(logging.getLevelName(logger_level)) is int:
             level = logging.getLevelName(logger_level)
 
-        os.makedirs('logs', exist_ok=True)
-
         cls.tz = Tz.timezone()
         logging.Formatter.converter = cls.time_converter
-
         stream_handler = logging.StreamHandler()
+        handlers: List[logging.Handler] = [stream_handler]
 
-        file_handler = RotatingFileHandler(
-            filename=f'logs/{log_name}.log',
-            maxBytes=5 * 1024 * 1024,
-            backupCount=3,
-            encoding='utf-8'
-        )
+        output_log_file_enabled: bool = Env.get_bool_environment('OUTPUT_LOG_FILE_ENABLED', default=True)
+        if output_log_file_enabled:
+            os.makedirs('logs', exist_ok=True)
+            file_handler = RotatingFileHandler(
+                filename=f'logs/{log_name}.log',
+                maxBytes=5 * 1024 * 1024,
+                backupCount=3,
+                encoding='utf-8'
+            )
+            handlers.append(file_handler)
 
         # noinspection PyArgumentList
         logging.basicConfig(
-            handlers=[stream_handler, file_handler],
+            handlers=handlers,
             format=cls.format,
             level=level,
             datefmt="%Y-%m-%d %H:%M:%S",
