@@ -16,5 +16,13 @@ class Env:
         logger.debug(f'Get environment {env_name}={env}')
         return env
 
+    @staticmethod
+    def get_bool_environment(env_name: str, default: bool = True, required: bool = False) -> bool:
+        return Env.str2bool(Env.get_environment(env_name, str(default), required))
+
+    @staticmethod
+    def str2bool(s: str):
+        return s.lower() in ["true"]
+
 
 logger: logging.Logger = logging.getLogger(__name__)

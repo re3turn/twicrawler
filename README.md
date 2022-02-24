@@ -48,16 +48,17 @@ docker-compose up -d
 ## Common
 
 | Environment variable        | Description                                                                                                     | Require |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------- | ------- |
+|-----------------------------|-----------------------------------------------------------------------------------------------------------------|---------|
 | TWITTER_USER_IDS            | Twitter user ID to crawling.If multiple users are specified, separate them with `,`                             | ✓       |
 | INTERVAL                    | Crawler interval(minutes). default=`5` minutes                                                                  |         |
 | MODE_SPECIFIED              | Specifies Crawler mode. `rt`, `fav`, `mixed`. default=`rt`                                                      |         |
 | TWEET_COUNT                 | Specifies the number of tweet statuses to retrieve. default=`200`                                               |         |
-| TWEET_PAGES                 | Specifies the page of results to retrieve. default=`25`                                                          |         |
+| TWEET_PAGES                 | Specifies the page of results to retrieve. default=`25`                                                         |         |
 | SAVE_MODE                   | Specifies save media mode. `local` or `google`. default=`local`                                                 |         |
-| LOGGING_LEVEL               | [Logging level.](https://docs.python.org/3/library/logging.html#logging-levels) default=`INFO`                  |         |
+| LOGGING_LEVEL               | [Logging level](https://docs.python.org/3/library/logging.html#logging-levels).  default=`INFO`                 |         |
+| OUTPUT_LOG_FILE_ENABLED     | Enable the output to the log file. default=`"true"`                                                             |         |
 | DATABASE_URL                | Database url. format `postgres://<username>:<password>@<hostname>:<port>/<database>`                            | ✓       |
-| DATABASE_SSLMODE            | [Database sslmode.](https://gist.github.com/pfigue/3440e2bc986550a6b8ec#valid-sslmode-values) default=`require` |         |
+| DATABASE_SSLMODE            | [Database sslmode](https://gist.github.com/pfigue/3440e2bc986550a6b8ec#valid-sslmode-values). default=`require` |         |
 | TZ                          | Time zone                                                                                                       |         |
 | TWITTER_CONSUMER_KEY        | Twitter consumer API keys                                                                                       | ✓       |
 | TWITTER_CONSUMER_SECRET     | Twitter consumer API secret key                                                                                 | ✓       |
@@ -66,9 +67,9 @@ docker-compose up -d
 
 ## SAVE_MODE = google
 
-| Environment variable        | Description                                                            | Require |
-| --------------------------- | ---------------------------------------------------------------------- | ------- |
-| GOOGLE_CLIENT_ID            | Google API client id                                                   | ✓       |
-| GOOGLE_CLIENT_SECRET        | Google API client secret                                               | ✓       |
-| GOOGLE_REFRESH_TOKEN        | Google API refresh token                                               | ✓       |
-| GOOGLE_ALBUM_TITLE          | Specifies the album title to add media. default=`''`                   |         |
+| Environment variable | Description                                          | Require |
+|----------------------|------------------------------------------------------|---------|
+| GOOGLE_CLIENT_ID     | Google API client id                                 | ✓       |
+| GOOGLE_CLIENT_SECRET | Google API client secret                             | ✓       |
+| GOOGLE_REFRESH_TOKEN | Google API refresh token                             | ✓       |
+| GOOGLE_ALBUM_TITLE   | Specifies the album title to add media. default=`''` |         |
