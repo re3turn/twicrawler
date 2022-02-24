@@ -201,8 +201,8 @@ class TestCrawler:
 
     @mock.patch('time.sleep', mock_sleep)  # for retry
     def test_save_media__download_failed(self) -> None:
-        mock_request.urlretrieve.side_effect = urllib.error.HTTPError(TEST_MEDIA_URL, code=500, msg='', hdrs={},
-                                                                      fp=None)  # type: ignore
+        mock_request.urlretrieve.side_effect = urllib.error.HTTPError(TEST_MEDIA_URL, code=500, msg='',
+                                                                      hdrs={}, fp=None)  # type: ignore
 
         with LogCapture(level=logging.ERROR) as log:
             is_save = self.crawler.save_media(TEST_MEDIA_URL, TEST_DESCRIPTION, TEST_USER_ID)
