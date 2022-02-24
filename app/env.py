@@ -21,7 +21,7 @@ class Env:
         return Env.str2bool(Env.get_environment(env_name, str(default), required))
 
     @staticmethod
-    def str2bool(s: str):
+    def str2bool(s: str) -> bool:
         return s.lower() in ["true"]
 
 
